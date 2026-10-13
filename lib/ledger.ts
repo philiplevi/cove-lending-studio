@@ -10,7 +10,7 @@ const dateOnly=(s:unknown)=>String(s||'').slice(0,10);
 export function buildState(input:LedgerDataset,asOf:string) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(asOf)||Number.isNaN(Date.parse(asOf))) throw Error('Invalid as-of date');
   const borrowers=input.borrowers||[];
-  const products=(input.products||[]).map(p=>({...p,monthly_rate:Number(p.monthly_rate),max_per_loan:pesos(val(p,'max_per_loan_cents'))}));
+  const products: Row[] = (input.products||[]).map(p=>({...p,monthly_rate:Number(p.monthly_rate),max_per_loan:pesos(val(p,'max_per_loan_cents'))}));
   const prById=new Map(products.map(p=>[p.id,p]));const byId=new Map(borrowers.map(b=>[b.id,b]));
   const loans=(input.loans||[]).filter(l=>dateOnly(l.release_date)<=asOf);
   const payments=(input.payments||[]).filter(p=>dateOnly(p.paid_on)<=asOf).sort((a,b)=>String(b.paid_on).localeCompare(String(a.paid_on))||String(b.id).localeCompare(String(a.id)));
@@ -24,7 +24,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const paidByLoan=new Map<string,{amount:number,principal:number,interest:number}>();
   for(const p of payments){const x=paidByLoan.get(p.loan_id)||{amount:0,principal:0,interest:0};x.amount+=val(p,'amount_cents');x.principal+=val(p,'principal_cents');x.interest+=val(p,'interest_cents');paidByLoan.set(p.loan_id,x)}
   let overdue=0; const upcoming:Row[]=[];const exceptions:string[]=[];
-  const enriched=loans.map(l=>{
+  const enriched: Row[] = loans.map<Row>(l=>{
     const paid=paidByLoan.get(l.id)||{amount:0,principal:0,interest:0};
     const outstanding=val(l,'principal_cents')-paid.principal;
     const gross=val(l,'payable_cents')-paid.amount;
