@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.0 — Premium user experience
+
+- Redesigned executive dashboard with dark teal + emerald visual identity, portfolio asset banner and six meaningful lending KPIs.
+- Added dedicated Collections register: search, month/reversal filters, loan links, CSV export and existing post-payment workflow.
+- Added cashflow chart 6M/12M controls, portfolio concentration and overdue attention summary.
+- Simplified menu labels, improved mobile navigation/overlay, keyboard-friendly loan row access and form legibility.
+- Improved reconciliation messaging for workspaces without an imported baseline and detected repeated source receipts more precisely.
+- Added UI contract checks. Ledger, authentication endpoints, and database schema are unchanged.
+- Full Next.js production build requires local `npm run check` before pushing.
+
+# Changelog
+
 ## 2.1.0 — Source stabilization
 - Same-origin Next.js auth handler fixes dependency on browser-to-Supabase signup fetch.
 - Public read-only health endpoint but exposes only connection status and safe error descriptions.

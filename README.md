@@ -1,8 +1,18 @@
-# Cove Lending Studio 2.1 — Stable Source Refresh
+# Cove Lending Studio 2.2 — Premium Lending Workspace
 
 A private lending web application built with **Next.js 15, Supabase Auth/PostgreSQL, and Vercel**. This refresh retains your V2 ledger, SQL schema, financial dashboard, and historical-import format. It is intended to replace the existing **source files**, NOT to wipe or recreate the Supabase database.
 
-## What changed in this release
+## V2.2 premium interface release
+
+- Refreshed dark-teal navigation and executive dashboard based on a refined BI-style visual direction.
+- Six lending KPIs: monthly collections, receivables, realized interest, active loans, overdue installments and the next 7 days of scheduled collections.
+- New **Collections** register backed by the *existing* ledger and receipt entries, with quick posting, filtering, linked loan details and CSV export.
+- Responsive navigation and table styling; 6M/12M cashflow chart control; improved reconciliation messages when no historical baseline is present.
+- New UI contract tests. No new SQL migration, no historical import, no new credentials.
+
+**Start with [`UPGRADE_V2_2.md`](UPGRADE_V2_2.md)** for the safe drop-in update to your current GitHub/Vercel project.
+
+## Background: previous 2.1 stability fixes
 
 - Fixed TypeScript inferred types in `lib/ledger.ts` and explicitly typed cookie handlers in `lib/supabase.ts` and `middleware.ts`.
 - Replaced direct browser-to-Supabase login with a **same-origin POST `/api/auth`** server endpoint. This improves compatibility with restrictive browser networks and gives actionable API errors.
@@ -76,13 +86,13 @@ Expected original October 8, 2026 controls: capital ₱37,000; releases ₱219,0
 | `app/api/[...path]/route.ts` | Ledger reads, transactional writes and one-time import |
 | `lib/ledger.ts` | Read-only centavo-based financial dashboard calculations |
 | `supabase/migrations/` | **Existing** migration, unchanged; do NOT rerun |
-| `public/`, `app/studio/` | Premium dashboard and responsive interface |
+| `public/`, `app/studio/` | Premium dashboard and responsive interface (V2.2 overrides in `premium.css`) |
 | `tests/` | Unit checks for ledger and authentication/config diagnostics |
 | `.github/workflows/quality.yml` | Secondary GitHub quality gate |
 
 ## Security and operational limitations
 
-- **Local tests passed**, including the historical seed when supplied separately. This archive could not complete an `npm install`, full Next.js type-check/build, or `npm audit` in the generation environment because the npm registry was inaccessible. Run `npm install --include=dev`, `npm run check`, and `npm audit --omit=dev` on your connected VS Code machine **before deploying**. It would be inaccurate to label this archive production-verified.
+- **Local tests passed**, including the historical seed when supplied separately. This V2.2 archive could not complete an `npm install`, full Next.js type-check/build, or `npm audit` in the packaging environment because the npm registry was inaccessible. Source-level Node tests and headless browser interaction checks using synthetic data passed. Run `npm install --include=dev`, `npm run check`, and `npm audit --omit=dev` on your connected VS Code machine **before deploying**. It would be inaccurate to label this archive production-verified.
 - `GET /api/health` checks server connectivity to Supabase, not the correctness of RLS or all Auth/SQL policies. Full signup and database end-to-end tests require access to your actual Supabase project.
 - Do not expose finance records via the public assets, GitHub, logs, or screen shares. Use a private GitHub repo, protected Vercel deployment, and verified row-level security.
 - Self-service signup creates a **separate private workspace** per new user. After owner setup, close unneeded public signups and consider MFA. Test access with another account before storing live personal financial data.
