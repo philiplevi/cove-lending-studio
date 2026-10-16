@@ -1,99 +1,89 @@
-# Cove Lending Studio — Cloud Edition (V2)
+# Cove Lending Studio 2.1 — Stable Source Refresh
 
-A **deployment-ready source project** for a private personal lending operations workspace. This is a Next.js frontend and API layer backed by Supabase PostgreSQL. It reuses the tested V1 premium interface, adds Supabase authentication, database row-level isolation, and **atomic financial posting functions**. **It has not yet been deployed or tested against a live Supabase project.**
+A private lending web application built with **Next.js 15, Supabase Auth/PostgreSQL, and Vercel**. This refresh retains your V2 ledger, SQL schema, financial dashboard, and historical-import format. It is intended to replace the existing **source files**, NOT to wipe or recreate the Supabase database.
 
-## What's inside
+## What changed in this release
 
-- Dashboard — portfolio assets, cash, principal and gross receivables, collections, releases, realized interest, active/overdue loans, product mix, cash-flow movement, borrower concentration, upcoming collections
-- Loan ledger — product interest rates, contract installments, balances, individual repayment history, loan origination
-- Borrowers — permanent client IDs and aggregate exposure
-- Cashbook — fund inflows, releases, collections, expenses, withdrawals, financing costs
-- Intelligence — collection and lending patterns, interest received, portfolio concentration
-- Data integrity — frozen workbook comparison, audit journal, allocation exceptions, source receipt collisions, read-only JSON extracts
-- Owner login — Supabase Auth (email/password) and protected routes
-- Security — RLS `SELECT` restricted to workspace membership; direct table writes denied by RLS; signed-in owner mutations through database `SECURITY DEFINER` procedures; reversible receipts (not destructive deletes)
-- One-time private import — separate historical JSON with 4 borrowers, 4 products, 34 loans, 79 receipts, 6 capital entries, 13 outflows
+- Fixed TypeScript inferred types in `lib/ledger.ts` and explicitly typed cookie handlers in `lib/supabase.ts` and `middleware.ts`.
+- Replaced direct browser-to-Supabase login with a **same-origin POST `/api/auth`** server endpoint. This improves compatibility with restrictive browser networks and gives actionable API errors.
+- Added **GET `/api/health`** and a *Check Supabase connection* button on `/login`. The endpoint validates Vercel configuration and attempts a server-to-Supabase network check without returning the API key or borrower data.
+- Applied npm **PostCSS `^8.5.23` override** to address the reported vulnerability without a Next.js major-version change.
+- Added `*.tsbuildinfo` and private-file protection to `.gitignore`, an `npm run check` quality gate, authentication diagnostics tests, and an example GitHub Actions gate.
+- Preserved the initial Supabase SQL migration at `supabase/migrations/202610090001_cove.sql` without modification. **Do not rerun it on the same project.**
 
-## Deploy to your existing accounts (no Python required)
+## Upgrade an existing VS Code / GitHub project
 
-### A. Create a dedicated Supabase PROJECT (under your existing Supabase account)
+**Do not create a new repository or new Supabase project.** Your source is already deployed, and your SQL migration is already installed.
 
-1. Create a **new private Supabase project**, in a suitable region. A separate project avoids modifying schemas and authentication triggers in your other applications.
-2. Open **SQL Editor** and execute `supabase/migrations/202610090001_cove.sql` as a single migration. Review the SQL first. It adds an `auth.users` trigger that creates a workspace and four loan products when a **new user** signs up.
-3. Open **Project Settings → API**. Retrieve your Supabase **Project URL** and **publishable / anon key** (not the service-role key).
-4. Under **Authentication → URL Configuration**, set Site URL to your future Vercel domain; include appropriate redirect URLs. Enable email authentication. If you use email confirmation, configure SMTP/allowlist appropriately.
-5. Create your own first user through the application's signup page. Then **disable public self-signup** in Supabase Auth settings or limit registration to administrator-controlled invites, so random people cannot create new empty workspaces. Enable MFA for the owner when you configure it, and verify your project's email settings.
+1. In VS Code, make a backup or commit any valuable **nonsecret** local edits. Keep `.env.local`, private importer JSON and customer data in a private location, never in Git.
+2. Extract this ZIP to a temporary folder. Copy its source files and folders into the existing `Cove_Lending_Cloud_V2_Source` working folder, **replacing the old source files but preserving `.git/`, `.env.local`, and private data**. Do not delete the database or run the old SQL again.
+3. Inspect `.env.local` (do not share its actual contents):
 
-### B. Push the code to a PRIVATE GitHub repository
-
-- Extract the **source ZIP** to a **personal** computer. The actual borrower data is provided as a **separate JSON download**, intentionally NOT contained in the source ZIP. If you place it under `private_import/`, Git will ignore that folder. Do not upload the private JSON to GitHub.
-- Run `npm install` and `npm run dev` if testing locally (Node.js 20+ recommended).
-- Configure environment variables locally via `.env.local` (copy `.env.example`). Never commit `.env.local` or a Supabase service-role key.
-- Use your existing GitHub workflow to commit and push the project. **Keep repository visibility PRIVATE.**
-
-### C. Deploy on Vercel
-
-1. Import the GitHub repository into Vercel.
-2. Select framework **Next.js** and use default build `npm run build`.
-3. Set the following Vercel environment variables for Production and Preview:
-
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-project-publishable-key
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-real-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-or-anon-key
    ```
 
-   The publishable key is designed for browser access; **RLS must be enabled and correct**, which is why the migration is required.
-4. Deploy, then update your Supabase Auth Site URL to the canonical deployed HTTPS domain.
-5. Sign up and sign in at `/login` using your owner account.
-6. Open `/import`. Upload the **separately downloaded `Cove_Lending_Private_Import.json`** **directly through the authenticated browser**. This transfer is only to your signed-in application; the file is not stored in public site assets or your Git repo. The database migration is all-or-nothing and import is allowed only once into an empty ledger.
-7. Open the **Data integrity** section and verify the **October 8, 2026** totals below before posting any new transactions.
+   Use the *actual* values from the **same Supabase project** already linked in Vercel. These are browser-publishable values, not `sb_secret_`/service-role keys. Keep the real values in Vercel Production as well. If you change Vercel values, trigger a new deployment.
+4. Run from VS Code PowerShell:
 
-### Imported control totals (historical as of 2026-10-08)
+   ```powershell
+   npm install --include=dev
+   npm run check
+   npm audit --omit=dev
+   git status --short
+   git diff --check
+   ```
 
-| Financial measure | Imported source |
-|---|---:|
-| Capital infusions | ₱37,000 |
-| Loans released | ₱219,000 |
-| Collections | ₱236,100 |
-| Other outflows | ₱52,750 |
-| Cash balance | ₱1,350 |
-| Outstanding principal by loan | ₱27,083 |
-| Gross receivables including contract interest | ₱35,200 |
-| Collected interest per receipt ledger | ₱44,176 |
-| Cash + outstanding principal | ₱28,433 |
+   `npm install --include=dev` writes/updates `package-lock.json` and ensures TypeScript is installed for the quality gate. Commit that lockfile after you have a verified installation; `npm ci` can then be used for subsequent reproducible installs. **Do not use `npm audit fix --force`.**
+5. If every command passes, review the changes and commit tracked source files plus `package-lock.json`. Confirm `.env.local`, `private_import/`, `.next/`, and `*.tsbuildinfo` are absent from staged changes. Then push:
 
-**Preserved exceptions:** Monthly summary shows ₱27,076 principal and ₱44,183 interest; seven loans have historical ₱1 principal over-allocation; duplicate source receipt reference `R000024` is retained as two distinct entries; `LN0031` exceeds its regular loan product limit. These have NOT been silently corrected. Confirm against original bank/GCash statements before treating the migration as final.
+   ```powershell
+   git add .github .gitignore .env.example app lib middleware.ts public supabase tests package.json package-lock.json tsconfig.json next.config.ts README.md ARCHITECTURE.md
+   git diff --cached --stat
+   git diff --cached --check
+   git commit -m "Stabilize Cove auth, typings and dependency security"
+   git push origin main
+   ```
 
-## Files and responsibilities
+6. Vercel redeploys from `main`. Open `https://cove-lending-studio.vercel.app/login` and click **Check Supabase connection**. When it reports online, try **Create your workspace**. Check the Supabase Auth Users and logs if account creation is rejected.
 
-| Path | Purpose |
+**Important:** GitHub Actions also checks TypeScript/tests/build/audit after you push, but does not replace the local pre-push gate. It intentionally does not contact live Supabase or import personal data.
+
+## First owner signup and diagnosis
+
+- There are **no hardcoded accounts or passwords**. Register with your own email/password on the sign-up page.
+- Registration runs through `/api/auth` on the Cove server, which talks to Supabase. This avoids cross-origin browser fetches during signup.
+- If **Check Supabase connection** reports a missing or malformed URL/key, correct the values in Vercel **Production** (and `.env.local` for local tests), then redeploy. Secret-type values in Vercel may not be retrievable locally with `vercel env pull`; use the original values from Supabase.
+- If the connection check says **online** but signup reports **Database error saving new user**, use **Supabase → Logs → Auth** to inspect the workspace bootstrap trigger `public.cove_on_signup()`. We cannot resolve this class of error by changing React code alone.
+- If signup succeeds but says to verify your email, follow the verification email and sign in. Configure **Supabase → Authentication → URL Configuration** with the deployed domain. If you have disabled public signup before creating the owner, re-enable it temporarily in your project or create the account using the appropriate admin workflow.
+- Network testing is non-destructive; no signup/ledger records are created by `/api/health`.
+
+## Historical data and consistency
+
+Existing Cloud V2 data remains in Supabase. New source code **does not reset it**. If your workspace is empty, the one-time `/import` screen can accept the original *separate* `Cove_Lending_Private_Import.json`. Never place that file in the source repository or `/public`.
+
+Expected original October 8, 2026 controls: capital ₱37,000; releases ₱219,000; collections ₱236,100; outflows ₱52,750; cash ₱1,350; outstanding principal ₱27,083; cash + principal ₱28,433; interest collected ₱44,176. The legacy ₱7 allocation discrepancy and duplicate receipt reference are preserved for reconciliation rather than automatically overwritten.
+
+## Project layout
+
+| Directory | Responsibility |
 |---|---|
-| `app/studio/` | Premium V1 dashboard shell embedded in Next.js |
-| `public/studio-app.js` | Original chart/dashboard and data-entry front end |
-| `app/api/[...path]/route.ts` | Authenticated API that maps V1 calls to Supabase |
-| `lib/ledger.ts` | Read-only report projections in integer centavos |
-| `supabase/migrations/202610090001_cove.sql` | DB tables, RLS, Auth workspace bootstrap, atomic posting and import procedures |
-| `app/login/` | Email/password login and initial registration |
-| `app/import/` | Authenticated one-time historical import UI |
-| Separate `Cove_Lending_Private_Import.json` download | Borrower PII and transactions; **not included in source ZIP / repository** |
-| `tests/ledger.test.mjs` | Financial snapshot, historical reconciliation and reversal tests |
+| `app/login/page.tsx` | Owner registration and sign-in UI, connection diagnostics |
+| `app/api/auth/route.ts` | Same-origin signup/login with Supabase SSR cookies |
+| `app/api/health/route.ts` | Safe server-side configuration/network health check |
+| `middleware.ts` | Enforces authentication before private pages and ledger API |
+| `app/api/[...path]/route.ts` | Ledger reads, transactional writes and one-time import |
+| `lib/ledger.ts` | Read-only centavo-based financial dashboard calculations |
+| `supabase/migrations/` | **Existing** migration, unchanged; do NOT rerun |
+| `public/`, `app/studio/` | Premium dashboard and responsive interface |
+| `tests/` | Unit checks for ledger and authentication/config diagnostics |
+| `.github/workflows/quality.yml` | Secondary GitHub quality gate |
 
-## Current limitations — read before using real money
+## Security and operational limitations
 
-1. **Not yet production validated.** Database migration and browser-to-Supabase integration still require a live environment and end-to-end QA. The Next.js build could not be verified here because npm package registry access was unavailable. Pure ledger unit tests did pass.
-2. **Role model** initially provides one owner per private workspace. The RLS design supports members, but the staff-invite/approval interface is not implemented. Self-service signup should be disabled after registering the owner.
-3. **Financial basis** follows the workbook's flat monthly interest model and manually split principal/interest receipts. This is not full accrual accounting or an independently audited GL. Backdated operations use a current-cash check; point-in-time cash insufficiency warnings are not yet implemented. Payment schedules use 15-day increments for semi-monthly loans.
-4. **Portfolio reporting** currently loads records into an authenticated server function, then calculates dashboard views. It is designed for a small private lending portfolio; for more than several thousand records, move summaries and pagination to SQL views/RPCs.
-5. **Backups**: the Data Integrity screen exports a **read-only JSON ledger snapshot**, not a complete PostgreSQL database backup and not an automated restore. Configure and test independent managed database backups/recovery before live use.
-6. **Security/compliance**: before real deployment, independently test RLS with two distinct accounts, verify MFA/SMTP, arrange vulnerability review, data minimization/retention, privacy notices, lending compliance and data breach procedures appropriate to your business and location. No service-role key or private customer file should be placed in public assets.
-7. **Extensibility**: bank/GCash account-level reconciliation, maker-checker loan approvals, rescheduling, configurable repayment hierarchy, collection reminders, uploaded loan documents and formal double-entry GL are future work.
-
-## Test commands
-
-```bash
-npm run test:ledger   # Pure data projection, does not need Supabase account
-npm run typecheck     # After npm install
-npm run build         # After npm install
-```
-
-**Company-issued laptop:** after deployment, use a browser only where company acceptable-use policies allow. Initial project deployment and account administration should be done on your personal device.
+- **Local tests passed**, including the historical seed when supplied separately. This archive could not complete an `npm install`, full Next.js type-check/build, or `npm audit` in the generation environment because the npm registry was inaccessible. Run `npm install --include=dev`, `npm run check`, and `npm audit --omit=dev` on your connected VS Code machine **before deploying**. It would be inaccurate to label this archive production-verified.
+- `GET /api/health` checks server connectivity to Supabase, not the correctness of RLS or all Auth/SQL policies. Full signup and database end-to-end tests require access to your actual Supabase project.
+- Do not expose finance records via the public assets, GitHub, logs, or screen shares. Use a private GitHub repo, protected Vercel deployment, and verified row-level security.
+- Self-service signup creates a **separate private workspace** per new user. After owner setup, close unneeded public signups and consider MFA. Test access with another account before storing live personal financial data.
+- V2 remains a lightweight private lender ledger, not formal accrual accounting or a licensed lending platform. Bank/GCash reconciliation, underwriting, audit retention, regulatory/privacy controls, automatic backups/restores and accountant review remain future work.

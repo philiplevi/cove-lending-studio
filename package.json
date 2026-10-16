@@ -1,13 +1,15 @@
 {
   "name": "cove-lending-cloud",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:ledger": "node --experimental-strip-types --test tests/*.test.mjs"
+    "test:ledger": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:quality": "node --experimental-strip-types --test tests/*.test.mjs",
+    "check": "npm run typecheck && npm run test:quality && npm run build"
   },
   "dependencies": {
     "next": "^15.5.0",
@@ -22,5 +24,8 @@
     "@types/react-dom": "^19.1.0",
     "typescript": "^5.9.0"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "postcss": "^8.5.23"
+  }
 }

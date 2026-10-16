@@ -1,3 +1,7 @@
+# Cove Lending Studio 2.1 Architecture
+
+**Source refresh:** The V2 database, financial ledger and imported records remain compatible. Authentication now uses the same-origin `/api/auth` route and `/api/health` connection diagnostics. See `README.md` for the verified upgrade sequence.
+
 # Cove Lending Cloud — Technical Architecture
 
 ```text

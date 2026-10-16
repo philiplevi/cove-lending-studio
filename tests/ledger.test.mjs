@@ -25,9 +25,9 @@ test('reversal is accounted for as a signed transaction',()=>{
  const x=fixture(); x.payments.push({id:'R000002',loan_id:'LN0001',paid_on:'2026-10-01',amount_cents:-55000,principal_cents:-50000,interest_cents:-5000,method:'Cash',reverses_id:'R000001'});
  const s=buildState(x,'2026-10-09');assert.equal(s.summary.collections,0);assert.equal(s.summary.principal_outstanding,1000);assert.equal(s.summary.cash,1000);
 });
-test('historic spreadsheet import reconciles unchanged if private import is available',()=>{
- const path=new URL('../private_import/legacy_seed.json',import.meta.url);
- if(!fs.existsSync(path))return;
+const seedPath = new URL('../private_import/legacy_seed.json', import.meta.url);
+test('historic spreadsheet import reconciles against the private seed', {skip:!fs.existsSync(seedPath)},()=>{
+ const path=seedPath;
  const seed=JSON.parse(fs.readFileSync(path,'utf8'));
  const cents=v=>Math.round(Number(v)*100);
  const input={borrowers:seed.borrowers,products:seed.products.map(p=>({...p,max_per_loan_cents:cents(p.max_per_loan)})),

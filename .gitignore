@@ -1,8 +1,16 @@
 node_modules/
 .next/
+out/
 .env*
 !.env.example
+.vercel/
 private_import/
 *.sqlite3
+*.sqlite
 *.db
-.vercel/
+*.tsbuildinfo
+*.log
+*.zip
+*.bak
+.DS_Store
+Thumbs.db
