@@ -1,0 +1,31 @@
+name: Cove source quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      # First import may not have a lockfile. After npm install, commit package-lock.json,
+      # then change this line to npm ci for fully reproducible installations.
+      - name: Install dependencies
+        run: npm install --include=dev --no-fund
+      - name: Type-check
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:quality
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_ci_placeholder
+      - name: Production dependency security audit
+        run: npm audit --omit=dev --audit-level=high
