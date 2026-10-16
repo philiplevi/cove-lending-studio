@@ -42,3 +42,41 @@ test('historic spreadsheet import reconciles against the private seed', {skip:!f
  assert.equal(s.summary.interest_collected,44176);assert.equal(s.summary.active_loans,6);
  assert.ok(s.exceptions.find(x=>x.includes('R000024')));
 });
+
+test('void test loan with two receipt reversals restores original cash without deleting history',()=>{
+ const x=fixture();
+ x.payments.push({id:'R000002',loan_id:'LN0001',paid_on:'2026-09-25',amount_cents:11000,principal_cents:10000,interest_cents:1000,method:'Cash',source:'New entry'});
+ x.payments.push({id:'R000003',loan_id:'LN0001',paid_on:'2026-10-17',amount_cents:-55000,principal_cents:-50000,interest_cents:-5000,method:'Cash',reverses_id:'R000001',source:'Reversal'});
+ x.payments.push({id:'R000004',loan_id:'LN0001',paid_on:'2026-10-17',amount_cents:-11000,principal_cents:-10000,interest_cents:-1000,method:'Cash',reverses_id:'R000002',source:'Reversal'});
+ x.loan_voids=[{workspace_id:'workspace-demo',loan_id:'LN0001',voided_on:'2026-10-17',principal_cents:100000,reason:'Erroneous test loan created for acceptance testing'}];
+ const before=buildState(x,'2026-10-09');
+ assert.equal(before.summary.cash,1660);
+ assert.equal(before.summary.principal_outstanding,400);
+ assert.equal(before.loans[0].status,'Overdue');
+ const after=buildState(x,'2026-10-17');
+ assert.equal(after.summary.cash,2000);
+ assert.equal(after.summary.principal_outstanding,0);
+ assert.equal(after.summary.gross_outstanding,0);
+ assert.equal(after.summary.overdue_amount,0);
+ assert.equal(after.summary.active_loans,0);
+ assert.equal(after.summary.voided_loans,1);
+ assert.equal(after.summary.interest_collected,0);
+ assert.equal(after.summary.collections,0);
+ assert.equal(after.summary.releases,1000); // preserved original gross disbursement
+ assert.equal(after.summary.release_reversals,1000);
+ assert.equal(after.summary.net_releases,0);
+ assert.equal(after.summary.portfolio_assets,2000);
+ assert.equal(after.loans[0].status,'Voided');
+ assert.equal(after.loan_voids.length,1);
+ assert.equal(after.monthly.at(-1).cash,2000);
+ assert.ok(after.activity.some(a=>a.kind==='Loan void'&&a.amount===1000));
+});
+
+test('void after receipts were previously reversed posts no duplicate receipt reversal',()=>{
+ const x=fixture();x.payments.push({id:'R000002',loan_id:'LN0001',paid_on:'2026-10-15',amount_cents:-55000,principal_cents:-50000,interest_cents:-5000,method:'Cash',reverses_id:'R000001'});
+ x.loan_voids=[{loan_id:'LN0001',voided_on:'2026-10-17',principal_cents:100000,reason:'Testing cleanup only'}];
+ assert.equal(buildState(x,'2026-10-16').summary.cash,1000);
+ const s=buildState(x,'2026-10-17');
+ assert.equal(s.summary.cash,2000);assert.equal(s.summary.net_releases,0);
+ assert.equal(s.payments.length,2);assert.equal(s.summary.voided_loans,1);
+});

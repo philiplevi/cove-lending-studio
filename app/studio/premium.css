@@ -46,3 +46,23 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media(max-width:680px){.page-head{display:block}.page-actions{margin-top:15px}.page-head h1{font-size:26px}.topbar-right{gap:8px}.top-quick-pay{font-size:0;width:36px;padding:0;justify-content:center}.top-quick-pay svg{width:18px;height:18px}.executive-banner{grid-template-columns:1fr}.executive-main{padding:28px 23px 20px}.executive-side{grid-template-columns:1fr 1fr;margin:0 12px 12px}.executive-side-item{padding:14px 12px}.executive-side-item strong{font-size:17px}.executive-date{display:none}.executive-total{font-size:37px}.kpi-grid-six{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:15px;min-height:124px}.kpi-value{font-size:18px;letter-spacing:-.7px}.kpi-top{font-size:9.5px;gap:4px;margin-bottom:15px}.kpi-icon{height:26px;width:26px}.chart-actions{justify-content:start}.chart-summary strong{font-size:16px}.chart-shell{height:220px}.panel-pad{padding:19px}.allocation-panel .donut{height:144px;width:144px}.bottom-grid{grid-template-columns:1fr}.topbar .breadcrumb{font-size:9px}.table-section-header{flex-wrap:wrap}.collection-helper{align-items:start}.collection-helper .panel-link{display:none}.filters{flex-wrap:wrap}.searchbox{width:100%}.onboard-bar{flex-wrap:wrap}}
 @media(max-width:440px){.executive-side-item small{font-size:8px}.executive-side-item span{font-size:9px}.executive-side-item strong{font-size:14px}.executive-total{font-size:32px}.kpi-value{font-size:17px}.kpi-foot{font-size:9px}.page-actions .btn{padding:0 11px}.page-actions{gap:6px}.asof{padding:0 7px}.asof input{width:115px}.chart-summary{gap:18px}.metric-strip{grid-template-columns:1fr 1fr}.metric-tile{padding:15px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* V2.3 loan cancellation: high-friction, audit-visible operation */
+.void-loan-button{border-color:#d1b7a7!important;color:#8c4d36!important}
+.void-warning{display:flex;gap:12px;background:#fff3e9;border:1px solid #efceb6;border-radius:14px;padding:14px;margin-bottom:15px;color:#814323}
+.void-warning svg{flex-shrink:0;width:20px;height:20px}
+.void-warning p{font-size:13px;line-height:1.5;margin:5px 0 0}
+.void-steps{background:#f6f8f5;border-radius:14px;padding:12px 15px;margin:14px 0}
+.void-steps>div{display:flex;align-items:center;gap:9px;padding:9px 0;font-size:13px}
+.void-steps>div+div{border-top:1px solid #e4e9e5}
+.void-steps>div span{background:#dae8e1;border-radius:50%;width:22px;height:22px;display:grid;place-items:center;font-weight:700}
+.void-steps>div strong{margin-left:auto;white-space:nowrap}
+.void-receipts{font-size:13px;margin:14px 0;padding:12px;border:1px solid #e4e9e5;border-radius:12px}
+.void-receipts>div{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.void-confirm-check{display:flex;align-items:start;gap:9px;font-size:13px;margin:14px 0;line-height:1.5}
+.void-confirm-check input{margin-top:3px;accent-color:#a64434}
+.btn.danger-void{background:#a13e35;color:white;border:1px solid #a13e35}
+.btn.danger-void:hover{background:#873128}
+@media(max-width:680px){.void-steps>div{flex-wrap:wrap}.void-steps>div strong{margin-left:31px}}
+/* Confirmation opened from a loan drawer must remain above that drawer. */
+#modal-root .modal-backdrop{z-index:100}

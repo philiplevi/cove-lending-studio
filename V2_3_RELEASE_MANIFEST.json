@@ -1,0 +1,27 @@
+{
+  "version": "2.3.0",
+  "release_type": "audited atomic test loan void",
+  "new_files": [
+    "supabase/migrations/202610170001_void_test_loans.sql",
+    "tests/void-loan.test.mjs",
+    "UPGRADE_V2_3_VOID_LOAN.md"
+  ],
+  "files": {
+    "app/api/[...path]/route.ts": "934a1ce7610bc68e19c7c491362bbab6d05dfcbd9ffd54d67fbec69a50690f86",
+    "app/studio/premium.css": "4f295559d29d626a5958f9b4b0aeaeb5da4e45b4b9af705f92be338ce89445d3",
+    "lib/ledger.ts": "6e407a5da4b7af3db17c58c1245e580af0596e7e44ecfb6eebdb27c926870844",
+    "public/studio-app.js": "b67bf545a2cf8a3ab20361a0786562c9b00c39edab727b536d0ff41a532f9ed1",
+    "package.json": "73033f589bc48eeb075820c5a0f6a5c5b07811b91a7aacd65d517a5e54a8fea4",
+    "supabase/migrations/202610170001_void_test_loans.sql": "a0ac0caa6595c63eb24977d63b4fabca14c2fdcc159198e8b0bea87d3d256809",
+    "tests/ledger.test.mjs": "14d1136ce4d2e6e648b7f56db9aa098ddc2c3ec96dcaf0a164934f6a6f563a2e",
+    "tests/void-loan.test.mjs": "93010365389141dcc970e7ecc3b5c0e41da153c36de81e1eb13fea9ad6578e51",
+    "CHANGELOG.md": "a9e7ccf536b19b34bccd9433535120198863a3ee4633ce415ec1f039253e7d50",
+    "README.md": "6e26194881df9cedeb5b6ad76951e1f641b59fd3be19ad333634d39f5de0b71f",
+    "UPGRADE_V2_3_VOID_LOAN.md": "0122ddd824e1585a7c9b99ea768505a384cb07747a6f35e7146a24a85702568e"
+  },
+  "warnings": [
+    "Apply the additive SQL migration before deployment",
+    "Do not void loans involving unsettled real funds",
+    "Full Next.js build requires local npm install; npm registry unavailable in this environment"
+  ]
+}

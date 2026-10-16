@@ -22,3 +22,12 @@
 
 ### Must verify before production rollout
 Full dependency installation, Next.js type-check/build and vulnerability audit **were not runnable from the generation environment without npm registry access**. Run `npm install --include=dev`, `npm run check`, and `npm audit --omit=dev` on a connected local machine. Then validate real Supabase signup and workspace creation.
+
+## 2.3.0 — Atomic void test loan and receipt reversal (2026-10-17)
+
+- Added V2.3 additive SQL migration with `loan_voids` journal and owner-only atomic `cove_void_test_loan` RPC.
+- Voids remaining receipts (once) and offsets original release without physical deletion or retroactive editing.
+- Introduced clear user confirmation, read-only void preview, audit events, and voided loan status.
+- Reconciles principal, overdue, cash, reporting, monthly cash bridge, and as-of histories with void entries.
+- Added defensive tests for voided loan cash math, already-reversed receipts, and integration contract.
+- SQL migration must be applied before the V2.3 code is deployed. Live Supabase integration testing is still required.

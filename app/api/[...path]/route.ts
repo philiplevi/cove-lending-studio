@@ -18,7 +18,7 @@ async function selectAll(client:Awaited<ReturnType<typeof createClient>>,table:s
   const rows:Record<string,unknown>[]=[];
   for(let offset=0;offset<limit;offset+=1000){
     const query=client.from(table).select('*').eq('workspace_id',workspace);
-    const sorted=table==='installments'?query.order('loan_id').order('installment_no'):query.order(table==='legacy_baselines'?'workspace_id':'id');
+    const sorted=table==='installments'?query.order('loan_id').order('installment_no'):query.order(table==='legacy_baselines'?'workspace_id':table==='loan_voids'?'loan_id':'id');
     const {data,error}=await sorted.range(offset,offset+999);
     if(error)throw Error('500|Could not load '+table+': '+error.message);
     rows.push(...(data||[])); if(!data||data.length<1000) return rows;
@@ -27,7 +27,7 @@ async function selectAll(client:Awaited<ReturnType<typeof createClient>>,table:s
 }
 async function fullDataset(ctx:Awaited<ReturnType<typeof authContext>>){
   const {client,workspace}=ctx;
-  const names=['borrowers','products','loans','installments','payments','capital','outflows','audit_log','legacy_baselines'] as const;
+  const names=['borrowers','products','loans','installments','payments','capital','outflows','audit_log','legacy_baselines','loan_voids'] as const;
   const arrays=await Promise.all(names.map(name=>selectAll(client,name,workspace,name==='audit_log'?1000:10000)));
   const out:Record<string,Record<string,unknown>[]>={};names.forEach((key,i)=>out[key]=arrays[i]);
   return {...out,baseline:out.legacy_baselines?.[0]||null} as unknown as LedgerDataset;
@@ -69,6 +69,10 @@ export async function POST(request:NextRequest,{params}:Params){
     const payload=await request.json();
     if(!payload||typeof payload!=='object'||Array.isArray(payload))return json({error:'Expected JSON object'},400);
     const pathString=path.join('/');
+    if(path.length===3&&path[0]==='loans'&&path[2]==='void'){
+      const {data,error}=await ctx.client.rpc('cove_void_test_loan',{w:ctx.workspace,v:{...payload,loan_id:path[1]}});
+      if(error)throw Error(error.message);return json(data,201);
+    }
     if(pathString==='import'){
       const {data,error}=await ctx.client.rpc('cove_import_legacy',{w:ctx.workspace,doc:payload});
       if(error)throw Error(error.message);return json(data,201);

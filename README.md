@@ -97,3 +97,7 @@ Expected original October 8, 2026 controls: capital ₱37,000; releases ₱219,0
 - Do not expose finance records via the public assets, GitHub, logs, or screen shares. Use a private GitHub repo, protected Vercel deployment, and verified row-level security.
 - Self-service signup creates a **separate private workspace** per new user. After owner setup, close unneeded public signups and consider MFA. Test access with another account before storing live personal financial data.
 - V2 remains a lightweight private lender ledger, not formal accrual accounting or a licensed lending platform. Bank/GCash reconciliation, underwriting, audit retention, regulatory/privacy controls, automatic backups/restores and accountant review remain future work.
+
+### V2.3 test-loan void
+
+For existing users upgrading from V2.2, see [`UPGRADE_V2_3_VOID_LOAN.md`](./UPGRADE_V2_3_VOID_LOAN.md). Run the **additive** `supabase/migrations/202610170001_void_test_loans.sql` in your existing Supabase project *before* deploying the V2.3 app. No existing transactions are deleted. This action is strictly for mistaken/test entries where no real money is outstanding.
