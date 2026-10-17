@@ -1,8 +1,17 @@
-# Cove Lending Studio 2.2 — Premium Lending Workspace
+# Cove Lending Studio 3.0 — Private Financial Operations
 
 A private lending web application built with **Next.js 15, Supabase Auth/PostgreSQL, and Vercel**. This refresh retains your V2 ledger, SQL schema, financial dashboard, and historical-import format. It is intended to replace the existing **source files**, NOT to wipe or recreate the Supabase database.
 
-## V2.2 premium interface release
+
+## New in V3.0
+
+This consolidated release adds the **Operations Center** at `/studio/command` with loan-servicing documentation and controlled due-date extensions, borrower statements/PDF via browser print, cash-account tagging and reconciliation, collection follow-up records, and transparent forecast scenarios. Open [UPGRADE_V3_0.md](UPGRADE_V3_0.md) for staging, SQL migration, complete-file Git staging, test requirements, and explicit limitations. V3 is **not a replacement for licensed accounting, automatic banking, or underwritten credit models**.
+
+The UI and calculations preserve the existing 2.4 financial ledger. The new `202610170002_cove_v3_operations.sql` additive migration is required before accessing the Operations Center.
+
+---
+
+## Previous: V2.2 premium interface release
 
 - Refreshed dark-teal navigation and executive dashboard based on a refined BI-style visual direction.
 - Six lending KPIs: monthly collections, receivables, realized interest, active loans, overdue installments and the next 7 days of scheduled collections.
@@ -107,3 +116,7 @@ For existing users upgrading from V2.2, see [`UPGRADE_V2_3_VOID_LOAN.md`](./UPGR
 The dashboard now includes the active-capital financial summary, monthly flat-rate **contractual interest run rate**, and maximum installment due date among active loans. A new Collection planner provides all unpaid installments grouped by selected as-of date and collection urgency, with oldest-first receipt application. Reports include portfolio-aging buckets and scheduled collection coverage. There is **no new SQL migration** for V2.4.
 
 Definitions, deployment checks, and the October 16 validation baseline are documented in `UPGRADE_V2_4.md`.
+
+### Single-pass review workbook
+
+Review all modules and capture requested corrections in one list using `V3_0_ONE_PASS_REVIEW.md` rather than reviewing each interim version separately.

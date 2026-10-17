@@ -1,0 +1,84 @@
+{
+  "version": "3.0.0",
+  "base": "Cove Lending V2.4 source (retains prior V2.3 void loan migration)",
+  "schema_additive": "supabase/migrations/202610170002_cove_v3_operations.sql",
+  "supabase_live_tested": false,
+  "nextjs_production_build_verified": false,
+  "source_only_no_private_records": true,
+  "quality": {
+    "node_tests_passed": 33,
+    "node_tests_skipped_private_seed": 1,
+    "standalone_strict_ts_ledger_and_management": "PASS",
+    "tsx_parse_syntax": "PASS",
+    "offline_private_oct16_replay": "9 balances/date metrics match",
+    "live_sql_migration": "NOT RUN"
+  },
+  "updates": [
+    {
+      "path": "package.json",
+      "sha256": "51c7427f407fbd5f552c3026e5ebd9d4e9d09be7f8df3940881a784d31c2ceb1"
+    },
+    {
+      "path": "README.md",
+      "sha256": "062cf9d9a1d202d289ee836a14958dbde697e5bbe5a3f8b206fc5cb5fcf600ea"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "82f45f338a2b7284a19262f616a20d30f17f3c0eb6cf544a95b64d18f4301705"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "d1e13971c86c9e862909a6d96614a2670044099af761046ba60a90bdab6245e9"
+    },
+    {
+      "path": "lib/ledger.ts",
+      "sha256": "c86f1693a7ebb6b0ac38707eb3bfc558418a3884b01c2c5fcddbd35cf4054350"
+    },
+    {
+      "path": "lib/management.ts",
+      "sha256": "1bb0f963bd350a5014ac03f8c1fc2783ca0307ba81e6c764f7c4ee5ce865e740"
+    },
+    {
+      "path": "app/api/[...path]/route.ts",
+      "sha256": "4a3749aaa0f14e2d8c57ceaddb2292ea142be272601176f8029d0115276e39b8"
+    },
+    {
+      "path": "app/api/operations/route.ts",
+      "sha256": "d99e024fd0e6b7c562696c10555640ff1887a3c1461f5790977ee17c7ad70201"
+    },
+    {
+      "path": "app/studio/page.tsx",
+      "sha256": "d251f9c77f0aea70bbdcb2437fff3105de1070fedceb574285e9853469dd71d1"
+    },
+    {
+      "path": "app/studio/command/page.tsx",
+      "sha256": "79a07b5b91188384c5acdc5a0fc8c3116f4baa78e4a74e2436e632d5559f1d5e"
+    },
+    {
+      "path": "app/studio/command/command.css",
+      "sha256": "704792bb51b965aa37cd9dc820a3d34270b382399f4e5b8281c87ff8963db620"
+    },
+    {
+      "path": "supabase/migrations/202610170002_cove_v3_operations.sql",
+      "sha256": "498dfcf1bf3ea989307d67c6f218d244a102d67eaf3708f369e05e7077b4978e"
+    },
+    {
+      "path": "tests/v3-operations.test.mjs",
+      "sha256": "2979fefbd4a1f21733d05029530a0fc3641148deb23312892623e96922e719f5"
+    },
+    {
+      "path": "UPGRADE_V3_0.md",
+      "sha256": "4d18a096dffb6d8b1c2c975092a2be632c8dc79ac403c62e571b22f5f7e57d9b"
+    },
+    {
+      "path": "V3_0_ONE_PASS_REVIEW.md",
+      "sha256": "d8c674b9a4bfe499e4785a98341789da51ef989f50e6618264f5071825a99909"
+    }
+  ],
+  "followups": [
+    "Automatic SMS/email messages not included",
+    "Interest waivers/restructuring financial postings review-only",
+    "Bank statement syncing and scheduled backups not included",
+    "MFA configured in Supabase separately"
+  ]
+}

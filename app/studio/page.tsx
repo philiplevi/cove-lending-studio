@@ -19,6 +19,7 @@ export default function Studio() {
           <button type="button" className="nav-item" data-page="collections"><span data-icon="hand-coins"/> Collections</button>
           <button type="button" className="nav-item" data-page="schedule"><span data-icon="calendar-days"/> Collection planner</button>
           <button type="button" className="nav-item" data-page="transactions"><span data-icon="arrow-left-right"/> Cashbook</button>
+          <a className="nav-item" href="/studio/command"><span data-icon="chart-no-axes-combined"/> V3 Operations Center</a>
         </nav>
         <div className="sidebar-eyebrow nav-group-second">ANALYZE</div>
         <nav className="nav" aria-label="Insights and controls">

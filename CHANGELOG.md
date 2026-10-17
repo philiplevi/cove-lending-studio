@@ -1,3 +1,14 @@
+## V3.0 — Consolidated financial operations suite
+
+- Loan servicing: as-of-safe due-date extensions, original term preservation, full contractual payoff quote; review-only interest waiver, renewal and restructure requests.
+- Borrower statements with loan history, receipts and reversals, and print-to-PDF.
+- Cash/bank/e-wallet account mapping with double-count prevention, bank statement reconciliation snapshots and explicit unassigned balances; does not mutate global ledger cash.
+- Collection follow-up history, promise tracking and manual reminder drafts (no unsolicited external messages).
+- Cash-basis income/expense segmentation, forward installment cash scenarios, and audit/export operations center.
+- Additive owner-guarded and RLS-protected SQL migration; no change to imported records or original V2.3 loan void RPC.
+- As-of-sensitive extension projection and explicit tests for history, reversals, voids, coverage and forecasts.
+- Scope exclusions and secure release checklist: `UPGRADE_V3_0.md`.
+
 # Changelog
 
 ## 2.2.0 — Premium user experience

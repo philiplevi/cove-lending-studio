@@ -1,12 +1,13 @@
 /* Pure presentation-side projection. Database RPC is the authoritative financial write engine.
  * Monetary inputs are centavos; never mutate the source arrays. */
 type Row = Record<string, any>;
-export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];baseline?:Row|null;};
+export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];baseline?:Row|null;};
 const val=(r:Row,key:string)=>Number(r[key]||0);
 const pesos=(c:number)=>Math.round(c)/100;
 const rounded=(n:number)=>Math.round(n*100)/100;
 const daysBetween=(oldest:string,day:string)=>Math.round((Date.parse(day+'T12:00:00Z')-Date.parse(oldest+'T12:00:00Z'))/86400000);
 const dateOnly=(s:unknown)=>String(s||'').slice(0,10);
+const shiftedDate=(iso:string,days:number)=>new Date(Date.parse(iso+'T12:00:00Z')+days*86400000).toISOString().slice(0,10);
 export function buildState(input:LedgerDataset,asOf:string) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(asOf)||Number.isNaN(Date.parse(asOf))) throw Error('Invalid as-of date');
   const borrowers=input.borrowers||[];
@@ -15,6 +16,10 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const loans=(input.loans||[]).filter(l=>dateOnly(l.release_date)<=asOf);
   const voids=(input.loan_voids||[]).filter(v=>dateOnly(v.voided_on)<=asOf);
   const voidByLoan=new Map(voids.map(v=>[v.loan_id,v]));
+  const extensions=(input.loan_extensions||[]).filter(x=>dateOnly(x.effective_on)<=asOf)
+    .sort((a,b)=>String(a.effective_on).localeCompare(String(b.effective_on))||String(a.created_at||'').localeCompare(String(b.created_at||'')));
+  const extByLoan=new Map<string,Row[]>();
+  for(const extension of extensions){const list=extByLoan.get(extension.loan_id)||[];list.push(extension);extByLoan.set(extension.loan_id,list);}
   const payments=(input.payments||[]).filter(p=>dateOnly(p.paid_on)<=asOf).sort((a,b)=>String(b.paid_on).localeCompare(String(a.paid_on))||String(b.id).localeCompare(String(a.id)));
   const capital=(input.capital||[]).filter(x=>dateOnly(x.occurred_on)<=asOf);
   const outflows=(input.outflows||[]).filter(x=>dateOnly(x.occurred_on)<=asOf);
@@ -33,7 +38,14 @@ export function buildState(input:LedgerDataset,asOf:string) {
     const outstanding=val(l,'principal_cents')-paid.principal;
     const gross=val(l,'payable_cents')-paid.amount;
     const remainingInterest=val(l,'interest_cents')-paid.interest;
-    const list=(scheduleMap.get(l.id)||[]).sort((a,b)=>Number(a.installment_no)-Number(b.installment_no));
+    // As-of-effective maturity shifts; original installments remain unchanged in PostgreSQL.
+    // No interest/principal is recalculated by an extension.
+    const list: Row[]=(scheduleMap.get(l.id)||[]).map(i=>({...i,due_date:dateOnly(i.due_date)}));
+    list.sort((a,b)=>Number(a.installment_no)-Number(b.installment_no));
+    for(const extension of extByLoan.get(l.id)||[]){
+      const delta=daysBetween(dateOnly(extension.previous_maturity),dateOnly(extension.new_maturity));
+      for(const i of list)if(dateOnly(i.due_date)>=dateOnly(extension.effective_on))i.due_date=shiftedDate(dateOnly(i.due_date),delta);
+    }
     const scheduled=list.map(i=>({number:i.installment_no,due_date:dateOnly(i.due_date),amount:pesos(val(i,'amount_cents'))}));
     // Apply net posted receipts to installments, oldest first. This is a schedule
     // projection, NOT a replacement for the authoritative receipt allocations.
@@ -66,7 +78,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
       paid:pesos(paid.amount),paid_principal:pesos(paid.principal),paid_interest:pesos(paid.interest),
       principal_outstanding:voided?0:pesos(Math.max(0,outstanding)),gross_outstanding:voided?0:pesos(Math.max(0,gross)),
       remaining_interest:voided?0:pesos(Math.max(0,remainingInterest)),voided_on:voidRecord?dateOnly(voidRecord.voided_on):null,void_reason:voidRecord?.reason??null,overdue:pesos(overdueCents),days_past_due:oldest?daysBetween(oldest,asOf):0,
-      monthly_rate:Number(l.monthly_rate),status,schedule:scheduled};
+      monthly_rate:Number(l.monthly_rate),status,schedule:scheduled,extensions:extByLoan.get(l.id)||[]};
   }).sort((a,b)=>String(b.release_date).localeCompare(String(a.release_date))||String(b.id).localeCompare(String(a.id)));
   const activeContracts=enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided');
   // Contractual maturity is a scheduled date, not a promise that cash will arrive.
@@ -148,7 +160,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const reconciliation=reconItems.filter(([,key])=>Object.hasOwn(original,key)).map(([name,key,system])=>({name,book:Number(original[key]),system,variance:rounded(system-Number(original[key]))}));
   const refs=new Map<string,string>();
   for(const p of payments){if(p.source_ref&&refs.has(p.source_ref))exceptions.push(`${p.id}: duplicate imported source receipt ${p.source_ref}`);if(p.source_ref)refs.set(p.source_ref,p.id);}
-  return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,
+  return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
     monthly,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,

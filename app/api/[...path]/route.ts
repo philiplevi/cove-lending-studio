@@ -27,7 +27,7 @@ async function selectAll(client:Awaited<ReturnType<typeof createClient>>,table:s
 }
 async function fullDataset(ctx:Awaited<ReturnType<typeof authContext>>){
   const {client,workspace}=ctx;
-  const names=['borrowers','products','loans','installments','payments','capital','outflows','audit_log','legacy_baselines','loan_voids'] as const;
+  const names=['borrowers','products','loans','installments','payments','capital','outflows','audit_log','legacy_baselines','loan_voids','loan_extensions','cash_accounts','cash_allocations','account_reconciliations','collection_followups','servicing_notes'] as const;
   const arrays=await Promise.all(names.map(name=>selectAll(client,name,workspace,name==='audit_log'?1000:10000)));
   const out:Record<string,Record<string,unknown>[]>={};names.forEach((key,i)=>out[key]=arrays[i]);
   return {...out,baseline:out.legacy_baselines?.[0]||null} as unknown as LedgerDataset;

@@ -55,3 +55,8 @@ Browser (HTTPS)
 ## Scope of automated testing
 
 The pure reporting tests exercise cash, payable, outstanding principal, historical as-of dates, reversals, and imported historical totals. They do **not** execute Postgres migrations or browser/API integration; production release requires those separately.
+
+
+## V3.0 extension
+
+`lib/management.ts` holds pure, read-only statement/forecast/cash-basis logic. `/studio/command` is a separate authenticated Next.js client screen. `/api/operations` uses the existing Supabase owner context and the single-transaction PostgreSQL `cove_operations` function from migration `202610170002`. `loan_extensions` provides as-of-effective future due-date shifts without modifying the `installments` or `loans` source records. `cash_allocations` is a memorandum classification table: it never changes cash balances. See `UPGRADE_V3_0.md` for scope boundaries.
