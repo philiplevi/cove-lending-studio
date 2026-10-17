@@ -158,6 +158,50 @@ export function buildState(input:LedgerDataset,asOf:string) {
     running+=m.capital-m.releases+m.release_reversals+m.collections-m.outflows;
     return{month:m.month,capital:pesos(m.capital),releases:pesos(m.releases),release_reversals:pesos(m.release_reversals),collections:pesos(m.collections),outflows:pesos(m.outflows),cash:pesos(running)};
   });
+  // Portfolio asset movement (the legacy "Factors Increasing Asset" report).
+  // Reconstruct month-end cash + unpaid principal. Principal repayments / loan
+  // releases merely move value between cash and receivables; they are NOT income.
+  // Historical source allocations occasionally exceed individual loan principal
+  // by ₱1. Expose their reconciliation effect instead of attributing it to interest.
+  const monthlyByKey=new Map(monthly.map(m=>[m.month,m]));
+  const interestByMonth=new Map<string,number>();
+  for(const payment of payments){const key=dateOnly(payment.paid_on).slice(0,7);
+    interestByMonth.set(key,(interestByMonth.get(key)||0)+val(payment,'interest_cents'));
+  }
+  const nextMonth=(key:string)=>{
+    const year=Number(key.slice(0,4)),month=Number(key.slice(5,7));
+    return month===12?`${year+1}-01`:`${year}-${String(month+1).padStart(2,'0')}`;
+  };
+  const bridgePaymentsByLoan=new Map<string,Row[]>();
+  for(const payment of payments){const list=bridgePaymentsByLoan.get(payment.loan_id)||[];list.push(payment);bridgePaymentsByLoan.set(payment.loan_id,list)}
+  const assetBridge:Row[]=[];
+  let openingAssetsCents=0,priorCashCents=0;
+  if(monthly.length){
+    for(let key=monthly[0].month;key<=asOf.slice(0,7);key=nextMonth(key)){
+      const record=monthlyByKey.get(key);
+      const periodEnd=key===asOf.slice(0,7)?asOf:`${key}-31`;
+      const cashCents=record?Math.round(record.cash*100):priorCashCents;
+      const principalCents=loans.reduce((total,loan)=>{
+        if(dateOnly(loan.release_date)>periodEnd)return total;
+        const historicalVoid=voidByLoan.get(loan.id);
+        if(historicalVoid&&dateOnly(historicalVoid.voided_on)<=periodEnd)return total;
+        const applied=(bridgePaymentsByLoan.get(loan.id)||[]).filter(payment=>dateOnly(payment.paid_on)<=periodEnd)
+          .reduce((acc,payment)=>acc+val(payment,'principal_cents'),0);
+        return total+Math.max(0,val(loan,'principal_cents')-applied);
+      },0);
+      const closingAssetsCents=cashCents+principalCents;
+      const fundingCents=Math.round((record?.capital||0)*100);
+      const interestCents=interestByMonth.get(key)||0;
+      const outflowCents=Math.round((record?.outflows||0)*100);
+      const adjustmentCents=closingAssetsCents-openingAssetsCents-fundingCents-interestCents+outflowCents;
+      assetBridge.push({month:key,opening_assets:pesos(openingAssetsCents),capital_infusion:pesos(fundingCents),
+        interest_collected:pesos(interestCents),outflows:pesos(outflowCents),
+        allocation_adjustment:pesos(adjustmentCents),closing_assets:pesos(closingAssetsCents),
+        closing_cash:pesos(cashCents),closing_principal:pesos(principalCents)});
+      openingAssetsCents=closingAssetsCents;
+      priorCashCents=cashCents;
+    }
+  }
   const activity:Row[]=[];
   for(const p of payments)activity.push({id:p.id,date:dateOnly(p.paid_on),title:`Payment · ${byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown'}`,subtitle:`${p.loan_id} · ${p.method}`,kind:'Collection',amount:pesos(val(p,'amount_cents')),loan_id:p.loan_id});
   for(const l of enriched)activity.push({id:l.id,date:dateOnly(l.release_date),title:`Loan release · ${l.borrower_name}`,subtitle:l.product_name,kind:'Release',amount:-l.principal,loan_id:l.id});
@@ -177,7 +221,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
-    monthly,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,
+    monthly,asset_bridge:assetBridge,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,
     upcoming:upcoming.sort((a,b)=>a.due_date.localeCompare(b.due_date)),activity,reconciliation,exceptions,
     audit_log:(input.audit_log||[]).map(a=>({...a,actor:a.actor_id?'Owner':'System',occurred_at:a.occurred_at||new Date().toISOString()})),
     data_source:input.baseline?.source_name||'Live workspace'};

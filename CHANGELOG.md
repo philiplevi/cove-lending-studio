@@ -1,3 +1,11 @@
+## V3.2 — Portfolio asset-movement chart (October 2026)
+
+- Restored **Factors increasing assets** directly on the executive dashboard, alongside existing collections/release comparisons.
+- Shows opening portfolio assets, monthly capital infusions, interest cash receipts, cash outflows, closing portfolio assets, and any separately disclosed allocation-adjustment amount.
+- Added All history / 12 months / 6 months controls, hover details, monthly audit table, and CSV export.
+- Handles past-dated reporting, receipt reversals, loan voids, and months without transactions without creating or mutating ledger records.
+- No database migration; retains the historical ₱8 principal/interest classification difference as a disclosed reconciliation item.
+
 ## V3.1 — Executive Dashboard & Portfolio Risk (2026-10-17)
 
 - Rebuilt the lending dashboard around a high-priority financial overview, a readable capital and interest module, portfolio-quality panel, action-oriented collection queue, and source-backed charts.

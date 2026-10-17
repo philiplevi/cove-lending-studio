@@ -126,3 +126,7 @@ Definitions, deployment checks, and the October 16 validation baseline are docum
 ### Single-pass review workbook
 
 Review all modules and capture requested corrections in one list using `V3_0_ONE_PASS_REVIEW.md` rather than reviewing each interim version separately.
+
+### V3.2 asset movement
+
+The executive dashboard now includes a read-only **Factors increasing assets** chart (the original spreadsheet visual). It uses live cash plus outstanding principal snapshots and displays monthly capital, interest collected, outflows, and any principal-allocation reconciliation effect separately. Opening balance + capital + interest − outflows + allocation adjustment = closing portfolio assets. This is a portfolio asset bridge, not a cashflow statement. See `UPGRADE_V3_2.md`.

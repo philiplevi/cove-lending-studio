@@ -1,0 +1,20 @@
+{
+  "release": "3.2.0",
+  "upgrade_type": "frontend+financial_projection_read_only",
+  "source_base": "Cove 3.1",
+  "database_migration_required": false,
+  "modified": [
+    "lib/ledger.ts",
+    "public/studio-app.js",
+    "app/studio/executive.css",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "new": [
+    "tests/asset-bridge.test.mjs",
+    "UPGRADE_V3_2.md",
+    "V3_2_RELEASE_MANIFEST.json"
+  ],
+  "private_data_included": false
+}
