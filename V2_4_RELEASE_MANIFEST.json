@@ -1,0 +1,24 @@
+{
+  "version": "2.4.0",
+  "database_migration_required": false,
+  "modified_or_added_files": [
+    "app/studio/page.tsx",
+    "app/studio/premium.css",
+    "lib/ledger.ts",
+    "public/studio-app.js",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "tests/portfolio-intelligence.test.mjs",
+    "UPGRADE_V2_4.md",
+    "V2_4_RELEASE_MANIFEST.json"
+  ],
+  "private_lending_data_included": false,
+  "required_gates": [
+    "npm run check",
+    "npm audit --omit=dev",
+    "git diff --check",
+    "git diff --cached --check",
+    "git diff --cached --name-only"
+  ]
+}

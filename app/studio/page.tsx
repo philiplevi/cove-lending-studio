@@ -17,6 +17,7 @@ export default function Studio() {
           <button type="button" className="nav-item" data-page="loans"><span data-icon="layers"/> Loans</button>
           <button type="button" className="nav-item" data-page="borrowers"><span data-icon="users"/> Borrowers</button>
           <button type="button" className="nav-item" data-page="collections"><span data-icon="hand-coins"/> Collections</button>
+          <button type="button" className="nav-item" data-page="schedule"><span data-icon="calendar-days"/> Collection planner</button>
           <button type="button" className="nav-item" data-page="transactions"><span data-icon="arrow-left-right"/> Cashbook</button>
         </nav>
         <div className="sidebar-eyebrow nav-group-second">ANALYZE</div>

@@ -101,3 +101,9 @@ Expected original October 8, 2026 controls: capital ₱37,000; releases ₱219,0
 ### V2.3 test-loan void
 
 For existing users upgrading from V2.2, see [`UPGRADE_V2_3_VOID_LOAN.md`](./UPGRADE_V2_3_VOID_LOAN.md). Run the **additive** `supabase/migrations/202610170001_void_test_loans.sql` in your existing Supabase project *before* deploying the V2.3 app. No existing transactions are deleted. This action is strictly for mistaken/test entries where no real money is outstanding.
+
+## V2.4 — Collection planner and capital intelligence
+
+The dashboard now includes the active-capital financial summary, monthly flat-rate **contractual interest run rate**, and maximum installment due date among active loans. A new Collection planner provides all unpaid installments grouped by selected as-of date and collection urgency, with oldest-first receipt application. Reports include portfolio-aging buckets and scheduled collection coverage. There is **no new SQL migration** for V2.4.
+
+Definitions, deployment checks, and the October 16 validation baseline are documented in `UPGRADE_V2_4.md`.

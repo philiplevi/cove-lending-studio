@@ -31,3 +31,11 @@ Full dependency installation, Next.js type-check/build and vulnerability audit *
 - Reconciles principal, overdue, cash, reporting, monthly cash bridge, and as-of histories with void entries.
 - Added defensive tests for voided loan cash math, already-reversed receipts, and integration contract.
 - SQL migration must be applied before the V2.3 code is deployed. Live Supabase integration testing is still required.
+
+## 2.4.0 — Capital & collection intelligence
+
+- Added live active-capital summary panel, monthly contractual flat interest and latest due date of active loans, with separate cash-basis interest and legacy-source comparison.
+- Added Collection planner with loan/borrower search, overdue, due today, next 7/30 day filters, partial-payment application and receipt action.
+- Added contractual due coverage and four aging buckets to Insights & Reports.
+- Added seven portfolio intelligence tests plus one render smoke test; retained V2.3 voided-loan logic and historical snapshots.
+- No Supabase migration. Full local quality gate required before deploying to Vercel.

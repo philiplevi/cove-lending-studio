@@ -25,7 +25,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   }
   const paidByLoan=new Map<string,{amount:number,principal:number,interest:number}>();
   for(const p of payments){const x=paidByLoan.get(p.loan_id)||{amount:0,principal:0,interest:0};x.amount+=val(p,'amount_cents');x.principal+=val(p,'principal_cents');x.interest+=val(p,'interest_cents');paidByLoan.set(p.loan_id,x)}
-  let overdue=0; const upcoming:Row[]=[];const exceptions:string[]=[];
+  let overdue=0; const upcoming:Row[]=[];const scheduleItems:Row[]=[];const exceptions:string[]=[];
   const enriched: Row[] = loans.map<Row>(l=>{
     const paid=paidByLoan.get(l.id)||{amount:0,principal:0,interest:0};
     const voidRecord=voidByLoan.get(l.id);
@@ -35,6 +35,21 @@ export function buildState(input:LedgerDataset,asOf:string) {
     const remainingInterest=val(l,'interest_cents')-paid.interest;
     const list=(scheduleMap.get(l.id)||[]).sort((a,b)=>Number(a.installment_no)-Number(b.installment_no));
     const scheduled=list.map(i=>({number:i.installment_no,due_date:dateOnly(i.due_date),amount:pesos(val(i,'amount_cents'))}));
+    // Apply net posted receipts to installments, oldest first. This is a schedule
+    // projection, NOT a replacement for the authoritative receipt allocations.
+    if(!voided&&gross>0){
+      let available=Math.max(0,paid.amount);
+      for(const i of list){
+        const amount=val(i,'amount_cents');
+        const applied=Math.min(amount,available);
+        available-=applied;
+        const due=dateOnly(i.due_date);
+        if(amount>applied) scheduleItems.push({loan_id:l.id,borrower:byId.get(l.borrower_id)?.name||'Unknown',installment_no:i.installment_no,
+          due_date:due,scheduled:pesos(amount),paid:pesos(applied),amount:pesos(amount-applied),
+          status:due<asOf?'Overdue':due===asOf?'Due today':'Upcoming',
+          days_past_due:due<asOf?daysBetween(due,asOf):0});
+      }
+    }
     const dueToDate=list.filter(i=>dateOnly(i.due_date)<asOf).reduce((acc,i)=>acc+val(i,'amount_cents'),0);
     const overdueCents=voided?0:Math.max(0,dueToDate-paid.amount);overdue+=overdueCents;
     let balanceToAllocate=paid.amount;let oldest:string|undefined;
@@ -53,6 +68,14 @@ export function buildState(input:LedgerDataset,asOf:string) {
       remaining_interest:voided?0:pesos(Math.max(0,remainingInterest)),voided_on:voidRecord?dateOnly(voidRecord.voided_on):null,void_reason:voidRecord?.reason??null,overdue:pesos(overdueCents),days_past_due:oldest?daysBetween(oldest,asOf):0,
       monthly_rate:Number(l.monthly_rate),status,schedule:scheduled};
   }).sort((a,b)=>String(b.release_date).localeCompare(String(a.release_date))||String(b.id).localeCompare(String(a.id)));
+  const activeContracts=enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided');
+  // Contractual maturity is a scheduled date, not a promise that cash will arrive.
+  const scheduledFinalCollectionDate=activeContracts.reduce<string|null>((latest,l)=>{
+    const dates=l.schedule.map((i:Row)=>i.due_date).filter((d:string)=>/^\d{4}-\d{2}-\d{2}$/.test(d));
+    const end=dates.length?dates.reduce((max:string,d:string)=>d>max?d:max):null;
+    return end&&(!latest||end>latest)?end:latest;
+  },null);
+  scheduleItems.sort((a,b)=>a.due_date.localeCompare(b.due_date)||a.loan_id.localeCompare(b.loan_id)||a.installment_no-b.installment_no);
   const sum=(rows:Row[],column:string)=>rows.reduce((a,r)=>a+val(r,column),0);
   const cap=sum(capital,'amount_cents'),disb=sum(loans,'principal_cents'),col=sum(payments,'amount_cents'),outs=sum(outflows,'amount_cents'),voidReversals=sum(voids,'principal_cents');
   const cash=cap-disb+col-outs+voidReversals, principalOutstanding=rounded(enriched.reduce((a,l)=>a+l.principal_outstanding,0));
@@ -62,13 +85,37 @@ export function buildState(input:LedgerDataset,asOf:string) {
     portfolio_assets:rounded(pesos(cash)+principalOutstanding),capital:pesos(cap),releases:pesos(disb),release_reversals:pesos(voidReversals),net_releases:pesos(disb-voidReversals),collections:pesos(col),outflows:pesos(outs),
     principal_collected:pesos(sum(payments,'principal_cents')),interest_collected:pesos(interestCollected),financing_cost:pesos(financingCost),
     net_interest_cash:pesos(interestCollected-financingCost),
-    monthly_interest_run_rate:pesos(enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided').reduce((a,l)=>a+Math.round(val(l,'principal_cents')*Number(l.monthly_rate)),0)),
+    // Flat-rate approved monthly contract amount for active loans, not actual
+    // interest accrued or money earned and received this calendar month.
+    monthly_interest_run_rate:pesos(activeContracts.reduce((a,l)=>a+Math.round(val(l,'principal_cents')*Number(l.monthly_rate)),0)),
+    scheduled_final_collection_date:scheduledFinalCollectionDate,
+    last_due_is_past:Boolean(scheduledFinalCollectionDate&&scheduledFinalCollectionDate<asOf),
     monthly_funding_interest:pesos(sum(capital.filter(c=>c.source_type==='Loan'&&!['cancelled','closed','repaid'].includes(String(c.status).toLowerCase())),'funding_interest_cents')),
     active_original_principal:rounded(enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided').reduce((a,l)=>a+l.principal,0)),
     overdue_amount:pesos(overdue),overdue_loans:enriched.filter(l=>l.status==='Overdue').length,
     active_loans:enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided').length,settled_loans:enriched.filter(l=>l.status==='Settled').length,voided_loans:enriched.filter(l=>l.status==='Voided').length,
     capital_deployed_pct:pesos(cash)+principalOutstanding>0?rounded(principalOutstanding/(pesos(cash)+principalOutstanding)*100):0,
+    available_capital:rounded(pesos(cash)+principalOutstanding),
     collection_rate:loans.filter(l=>!voidByLoan.has(l.id)).length?rounded(col/sum(loans.filter(l=>!voidByLoan.has(l.id)),'payable_cents')*100):0};
+  // Age only unpaid installments that are actually past their contractual due date.
+  const aging=[{label:'1–30 days',min:1,max:30},{label:'31–60 days',min:31,max:60},{label:'61–90 days',min:61,max:90},{label:'90+ days',min:91,max:Infinity}]
+    .map(b=>({label:b.label,amount:rounded(scheduleItems.filter(i=>i.status==='Overdue'&&i.days_past_due>=b.min&&i.days_past_due<=b.max).reduce((a,i)=>a+i.amount,0)),
+      installments:scheduleItems.filter(i=>i.status==='Overdue'&&i.days_past_due>=b.min&&i.days_past_due<=b.max).length}));
+  const dueByDate=(status:string)=>scheduleItems.filter(i=>i.status===status).reduce((a,i)=>a+Math.round(i.amount*100),0);
+  const cumulativeScheduledDue=loans.filter(l=>!voidByLoan.has(l.id)).reduce((acc,l)=>acc+(scheduleMap.get(l.id)||[])
+    .filter(i=>dateOnly(i.due_date)<=asOf).reduce((sum,i)=>sum+val(i,'amount_cents'),0),0);
+  // This is a contractual collection coverage proxy. Early receipts are allocated
+  // to the oldest due installment, while unpaid future dues stay excluded.
+  const cumulativeCoverage=loans.filter(l=>!voidByLoan.has(l.id)).reduce((acc,l)=>{
+    const due=(scheduleMap.get(l.id)||[]).filter(i=>dateOnly(i.due_date)<=asOf).reduce((sum,i)=>sum+val(i,'amount_cents'),0);
+    return acc+Math.min(due,Math.max(0,paidByLoan.get(l.id)?.amount||0));
+  },0);
+  const collectionIntelligence={due_today:pesos(dueByDate('Due today')),past_due:pesos(dueByDate('Overdue')),
+    due_next_7_days:rounded(scheduleItems.filter(i=>i.due_date>asOf&&daysBetween(asOf,i.due_date)<=7).reduce((a,i)=>a+i.amount,0)),
+    due_next_30_days:rounded(scheduleItems.filter(i=>i.due_date>asOf&&daysBetween(asOf,i.due_date)<=30).reduce((a,i)=>a+i.amount,0)),
+    due_to_date:pesos(cumulativeScheduledDue),covered_due_to_date:pesos(cumulativeCoverage),
+    collection_coverage_pct:cumulativeScheduledDue?rounded(cumulativeCoverage/cumulativeScheduledDue*100):null,
+    open_installments:scheduleItems.length,aging};
   const concentration=borrowers.map(b=>{
     const own=enriched.filter(l=>l.borrower_id===b.id),amount=rounded(own.reduce((a,l)=>a+l.principal_outstanding,0));
     return{id:b.id,name:b.name,amount,share:principalOutstanding?Math.round(amount/principalOutstanding*1000)/10:0,active_loans:own.filter(l=>l.status!=='Settled'&&l.status!=='Voided').length,lifetime_loans:own.length};
@@ -104,7 +151,8 @@ export function buildState(input:LedgerDataset,asOf:string) {
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
-    monthly,concentration,upcoming:upcoming.sort((a,b)=>a.due_date.localeCompare(b.due_date)),activity,reconciliation,exceptions,
+    monthly,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,
+    upcoming:upcoming.sort((a,b)=>a.due_date.localeCompare(b.due_date)),activity,reconciliation,exceptions,
     audit_log:(input.audit_log||[]).map(a=>({...a,actor:a.actor_id?'Owner':'System',occurred_at:a.occurred_at||new Date().toISOString()})),
     data_source:input.baseline?.source_name||'Live workspace'};
 }
