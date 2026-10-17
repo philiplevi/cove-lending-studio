@@ -21,10 +21,10 @@ test('Collections register uses the existing loan/payment ledger rather than a p
 });
 
 test('Dashboard retains cash-basis labels, as-of filtering, and empty-baseline guidance', () => {
-  for (const label of ['Collections this month','Past-due installments','Due in next 7 days','Interest collected','Gross receivables']) assert.ok(ui.includes(label));
-  assert.ok(ui.includes('No import baseline to compare'));
+  for (const label of ['Collections · this month','Past due','Due next 7 days','Interest received','Total receivables']) assert.ok(ui.includes(label));
+  assert.ok(ui.includes('Historical variance & definitions'));
   assert.ok(ui.includes('UI.asof'));
-  assert.ok(ui.includes('!hasBaseline'));
+  assert.ok(ui.includes('sourceInterest'));
 });
 
 test('Premium styling includes responsive layout and keyboard focus', () => {

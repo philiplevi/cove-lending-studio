@@ -93,6 +93,15 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const cash=cap-disb+col-outs+voidReversals, principalOutstanding=rounded(enriched.reduce((a,l)=>a+l.principal_outstanding,0));
   const grossOutstanding=rounded(enriched.reduce((a,l)=>a+l.gross_outstanding,0));
   const interestCollected=sum(payments,'interest_cents'),financingCost=sum(outflows.filter(o=>o.classification==='Financing cost'),'amount_cents');
+  // Principal-weighted risk measures (PAR), never the overdue-installment amount.
+  // A proxy until restructures/renegotiations are consistently risk-tagged.
+  const riskLoans=activeContracts.filter(l=>l.principal_outstanding>0);
+  const principalAtRisk=(days:number)=>rounded(riskLoans.filter(l=>l.days_past_due>days).reduce((n,l)=>n+l.principal_outstanding,0));
+  const parRate=(days:number)=>principalOutstanding>0?rounded(100*principalAtRisk(days)/principalOutstanding):null;
+  const parAging=[{label:'Current',min:0,max:0},{label:'1–30 days',min:1,max:30},{label:'31–60 days',min:31,max:60},{label:'61–90 days',min:61,max:90},{label:'90+ days',min:91,max:Infinity}].map(b=>({
+    label:b.label,loans:riskLoans.filter(l=>l.days_past_due>=b.min&&l.days_past_due<=b.max).length,
+    principal:rounded(riskLoans.filter(l=>l.days_past_due>=b.min&&l.days_past_due<=b.max).reduce((n,l)=>n+l.principal_outstanding,0))
+  }));
   const summary={cash:pesos(cash),principal_outstanding:principalOutstanding,gross_outstanding:grossOutstanding,
     portfolio_assets:rounded(pesos(cash)+principalOutstanding),capital:pesos(cap),releases:pesos(disb),release_reversals:pesos(voidReversals),net_releases:pesos(disb-voidReversals),collections:pesos(col),outflows:pesos(outs),
     principal_collected:pesos(sum(payments,'principal_cents')),interest_collected:pesos(interestCollected),financing_cost:pesos(financingCost),
@@ -105,6 +114,11 @@ export function buildState(input:LedgerDataset,asOf:string) {
     monthly_funding_interest:pesos(sum(capital.filter(c=>c.source_type==='Loan'&&!['cancelled','closed','repaid'].includes(String(c.status).toLowerCase())),'funding_interest_cents')),
     active_original_principal:rounded(enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided').reduce((a,l)=>a+l.principal,0)),
     overdue_amount:pesos(overdue),overdue_loans:enriched.filter(l=>l.status==='Overdue').length,
+    active_borrowers:new Set(activeContracts.map(l=>l.borrower_id)).size,
+    par30_pct:parRate(30),par60_pct:parRate(60),par90_pct:parRate(90),
+    principal_at_risk_30:principalAtRisk(30),principal_at_risk_60:principalAtRisk(60),principal_at_risk_90:principalAtRisk(90),
+    principal_aging:parAging,
+
     active_loans:enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided').length,settled_loans:enriched.filter(l=>l.status==='Settled').length,voided_loans:enriched.filter(l=>l.status==='Voided').length,
     capital_deployed_pct:pesos(cash)+principalOutstanding>0?rounded(principalOutstanding/(pesos(cash)+principalOutstanding)*100):0,
     available_capital:rounded(pesos(cash)+principalOutstanding),

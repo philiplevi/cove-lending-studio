@@ -1,3 +1,9 @@
+# V3.1 Dashboard release note
+
+V3.1 adds an executive lending dashboard with capital/run-rate clarity, monthly receipts, PAR30/60/90 proxies, aging, collection coverage, and action queue. See `DESIGN_RESEARCH_V3_1.md` and `UPGRADE_V3_1.md` for definitions and deployment. No new Supabase migration is required.
+
+---
+
 # Cove Lending Studio 3.0 — Private Financial Operations
 
 A private lending web application built with **Next.js 15, Supabase Auth/PostgreSQL, and Vercel**. This refresh retains your V2 ledger, SQL schema, financial dashboard, and historical-import format. It is intended to replace the existing **source files**, NOT to wipe or recreate the Supabase database.

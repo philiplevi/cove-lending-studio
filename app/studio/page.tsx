@@ -1,6 +1,7 @@
 import Script from 'next/script';
 import './studio.css';
 import './premium.css';
+import './executive.css';
 
 export default function Studio() {
   return <>

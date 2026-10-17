@@ -1,3 +1,12 @@
+## V3.1 — Executive Dashboard & Portfolio Risk (2026-10-17)
+
+- Rebuilt the lending dashboard around a high-priority financial overview, a readable capital and interest module, portfolio-quality panel, action-oriented collection queue, and source-backed charts.
+- Principal-weighted PAR30, PAR60 and PAR90 **proxies** and five principal aging buckets. These exclude special renegotiation treatment unless the loan is past due; see definitions.
+- Added active-borrower count, collection-coverage explanation and prioritized follow-up list. Kept historical interest reference inside a collapsible disclosure rather than displaying it as the headline.
+- Preserved existing cashbook, transactions, V3 Operations Center, loan voiding and extensions. No SQL migration.
+- WCAG-minded contrast and responsive typography with user-selectable as-of date.
+- Added tests for PAR denominators, past-date behavior, settled/voided loans, and empty portfolios.
+
 ## V3.0 — Consolidated financial operations suite
 
 - Loan servicing: as-of-safe due-date extensions, original term preservation, full contractual payoff quote; review-only interest waiver, renewal and restructure requests.

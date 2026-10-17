@@ -1,0 +1,25 @@
+{
+  "version": "3.1.0",
+  "release": "Executive Lending Dashboard",
+  "requires_migration": false,
+  "changes": [
+    "app/studio/page.tsx",
+    "app/studio/executive.css",
+    "public/studio-app.js",
+    "lib/ledger.ts",
+    "tests/ui-contract.test.mjs",
+    "tests/executive-dashboard.test.mjs",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "DESIGN_RESEARCH_V3_1.md",
+    "UPGRADE_V3_1.md",
+    "V3_1_RELEASE_MANIFEST.json"
+  ],
+  "validation": {
+    "tests_with_private_seed": "39 passed, 0 failed",
+    "financial_module_typescript": "passed",
+    "browser_synthetic_desktop_mobile": "passed",
+    "full_next_build": "required on developer machine"
+  }
+}
