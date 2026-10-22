@@ -1,0 +1,20 @@
+{
+  "version": "3.3.0",
+  "name": "Audited loan detail corrections",
+  "updated": [
+    "package.json",
+    "app/api/[...path]/route.ts",
+    "app/studio/premium.css",
+    "lib/ledger.ts",
+    "public/studio-app.js"
+  ],
+  "added": [
+    "supabase/migrations/202610220001_loan_corrections.sql",
+    "tests/loan-corrections.test.mjs",
+    "UPGRADE_V3_3.md",
+    "V3_3_RELEASE_MANIFEST.json"
+  ],
+  "database_migration_required": true,
+  "automated_live_database_test": false,
+  "notes": "This operation restates historic portfolio balances after correcting an incorrectly encoded loan. Audited originals are preserved. Stage migration and test before production."
+}

@@ -47,3 +47,13 @@ test('loan void offsets release without inventing asset growth',()=>{
  assert.equal(after.asset_bridge.at(-1).closing_assets,2000);
  assert.equal(after.asset_bridge.at(-1).allocation_adjustment,0);
 });
+
+// Regression: the global studio stylesheet gives icon SVGs a 20px width.
+// The asset plot must force its calculated width and allow horizontal scrolling.
+test('asset plot cannot be collapsed by the global 20px SVG icon rule',()=>{
+ const js=readFileSync(new URL('../public/studio-app.js',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../app/studio/executive.css',import.meta.url),'utf8');
+ assert.match(js,/class="v32-asset-svg"[^>]*style="width:\$\{w\}px;min-width:\$\{w\}px/);
+ assert.match(css,/\.v32-chart-scroll > svg\.v32-asset-svg\{[^}]*width:auto;/);
+ assert.match(css,/min-width:960px/);
+});

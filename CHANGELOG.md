@@ -67,3 +67,10 @@ Full dependency installation, Next.js type-check/build and vulnerability audit *
 - Added contractual due coverage and four aging buckets to Insights & Reports.
 - Added seven portfolio intelligence tests plus one render smoke test; retained V2.3 voided-loan logic and historical snapshots.
 - No Supabase migration. Full local quality gate required before deploying to Vercel.
+
+## 3.3.0 — Audited loan detail corrections
+- Added **Edit loan details** to the loan drawer with borrower, product, principal, rate, term and repayment-date/frequency controls.
+- Added an authenticated owner-only SQL preview/commit transaction, with optimistic concurrency and mandatory reason/confirmation.
+- Regenerates loan schedule and recomputes receipt splits where required, preserving receipt amounts, dates and references and archiving all old values.
+- Blocks incompatible corrections involving voided loans, approved extensions, mapped cash releases, or overpaid corrected contracts.
+- Added correction audit history, UI, tests, and a staging-first release guide. Existing SQL migrations and imported source baseline are preserved.

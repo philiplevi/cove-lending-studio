@@ -91,3 +91,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media(max-width:400px){.schedule-stat-grid{grid-template-columns:1fr}.aging-columns{grid-template-columns:1fr 1fr}}
 
 .source-comparison{font-size:10px;line-height:1.7;color:#708c81;background:#f7faf7;padding:9px 12px;border:1px solid #edf2ed;border-radius:8px;margin:0 0 14px}.source-comparison strong{color:#194f43}
+
+/* V3.3 — loan correction review */
+.correction-banner,.correction-warning{display:flex;gap:12px;padding:16px;border-radius:12px;margin:12px 0 22px;background:#eef5f3;border:1px solid #d5e6e0;color:#1b4446}
+.correction-warning{background:#fff8ee;border-color:#f5e0b7;color:#734b1c;margin-top:18px}
+.correction-banner svg,.correction-warning svg{width:20px!important;height:20px!important;flex:none}
+.correction-banner p,.correction-warning p{margin:5px 0 0;line-height:1.5;font-size:13px}
+.correction-hint{color:#58727b;font-size:13px;line-height:1.6;margin:12px 0}
+.correction-result{margin-top:16px;padding:18px;border:1px solid #cee1df;border-radius:15px;background:#fbfdfc}
+.correction-result h3{margin:0 0 12px;color:#14353d}
+.correction-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 16px}
+.correction-compare>div{background:white;border:1px solid #e0e9e8;padding:12px;border-radius:11px}
+.correction-compare small{display:block;color:#657e83;font-size:12px;margin-bottom:5px}
+.correction-compare strong{font-size:18px;color:#0a3e44}
+.correction-result details{margin-top:12px;padding:12px;background:white;border:1px solid #e1e9e8;border-radius:10px;overflow:auto}
+.correction-result summary{cursor:pointer;color:#075a5b;font-weight:700}
+.correction-history{padding:13px 15px;margin-top:16px;border:1px solid #d9e8e2;border-radius:12px;background:#f4faf7;font-size:12px;line-height:1.6;color:#325960}
+.correction-history strong{color:#124e4b}.correction-history p{margin:5px 0}
+@media(max-width:520px){.correction-compare{grid-template-columns:1fr}}

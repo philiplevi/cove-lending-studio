@@ -1,7 +1,7 @@
 /* Pure presentation-side projection. Database RPC is the authoritative financial write engine.
  * Monetary inputs are centavos; never mutate the source arrays. */
 type Row = Record<string, any>;
-export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];baseline?:Row|null;};
+export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];loan_corrections?:Row[];baseline?:Row|null;};
 const val=(r:Row,key:string)=>Number(r[key]||0);
 const pesos=(c:number)=>Math.round(c)/100;
 const rounded=(n:number)=>Math.round(n*100)/100;
@@ -219,6 +219,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const refs=new Map<string,string>();
   for(const p of payments){if(p.source_ref&&refs.has(p.source_ref))exceptions.push(`${p.id}: duplicate imported source receipt ${p.source_ref}`);if(p.source_ref)refs.set(p.source_ref,p.id);}
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
+    loan_corrections:input.loan_corrections||[], // expose restatement history even in earlier as-of views
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
     monthly,asset_bridge:assetBridge,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,

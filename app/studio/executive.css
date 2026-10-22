@@ -120,7 +120,8 @@ body{background:var(--v31-canvas);color:var(--v31-ink);font-family:Inter,"Segoe 
 .v32-legend-opening{background:#315e77}.v32-legend-capital{background:#1e9f83}.v32-legend-interest{background:#dbac51}.v32-legend-outflow{background:#cb7865}.v32-legend-closing{background:#102d39}.v32-legend-adjustment{background:#8a9fa8}
 .v32-chart-scroll{width:100%;overflow-x:auto;overflow-y:hidden;border:1px solid #e9f0f0;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdfd);outline-offset:3px}
 .v32-chart-scroll:focus-visible{outline:3px solid #167bb5}
-.v32-asset-svg{display:block;max-width:none;height:340px}
+/* Override the shared svg {width:20px} icon rule: this is a full-size plot, not an icon. */
+.v32-chart-scroll > svg.v32-asset-svg{display:block;width:auto;max-width:none;height:340px;min-width:960px;flex-shrink:0}
 .v32-grid{stroke:#e4ebed;stroke-width:1}.v32-zero{stroke:#99b2ba;stroke-width:1.3}
 .v32-axis{fill:#627d85;font-size:11px;font-family:Inter,"Segoe UI",Arial,sans-serif}
 .v32-opening{fill:#315e77}.v32-capital{fill:#1e9f83}.v32-interest{fill:#dbac51}.v32-outflow{fill:#cb7865}.v32-adjustment{fill:#8a9fa8}
