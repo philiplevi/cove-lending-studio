@@ -77,6 +77,10 @@ export async function POST(request:NextRequest,{params}:Params){
       const {data,error}=await ctx.client.rpc('cove_correct_loan',{w:ctx.workspace,lid:path[1],v:payload});
       if(error)throw Error(error.message);return json(data,201);
     }
+    if(path.length===3&&path[0]==='loans'&&path[2]==='cancel'){
+      const {data,error}=await ctx.client.rpc('cove_cancel_loan',{w:ctx.workspace,v:{...payload,loan_id:path[1]}});
+      if(error)throw Error(error.message);return json(data,201);
+    }
     if(path.length===3&&path[0]==='loans'&&path[2]==='void'){
       const {data,error}=await ctx.client.rpc('cove_void_test_loan',{w:ctx.workspace,v:{...payload,loan_id:path[1]}});
       if(error)throw Error(error.message);return json(data,201);

@@ -1,3 +1,10 @@
+## V3.4 — Owner-controlled loan cancellation (October 24, 2026)
+- Added **Cancel loan** to each current loan drawer, including imported loans when separately acknowledged.
+- Does not hard-delete financial history. Requires real disbursement and refund verification, zero outstanding receipts, and a reason.
+- Database procedure inserts a dated release contra-entry and audit snapshot atomically; it blocks unresolved payments, mapped transactions, loan extensions and linked cash outflows.
+- Cancellation appears as **Cancelled** in the interface and remains within the existing Voided reporting filter; preserved V2.3 test-only void remains available for test entries.
+- Changes to existing reports only take effect on the cancellation date; historical as-of positions remain unchanged.
+
 ## V3.2 — Portfolio asset-movement chart (October 2026)
 
 - Restored **Factors increasing assets** directly on the executive dashboard, alongside existing collections/release comparisons.

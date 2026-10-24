@@ -109,3 +109,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .correction-history{padding:13px 15px;margin-top:16px;border:1px solid #d9e8e2;border-radius:12px;background:#f4faf7;font-size:12px;line-height:1.6;color:#325960}
 .correction-history strong{color:#124e4b}.correction-history p{margin:5px 0}
 @media(max-width:520px){.correction-compare{grid-template-columns:1fr}}
+
+/* V3.4 cancellation control: visually distinct from everyday payment actions. */
+.cancel-loan-button{border-color:#d3a49b!important;color:#923d31!important}
+.cancel-loan-button:hover{background:#fff3f0!important}
+#form-cancel-loan .form-footer button[disabled]{opacity:.45;cursor:not-allowed}
+#form-cancel-loan .void-confirm-check{margin:13px 0;display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.5}
+#form-cancel-loan .void-confirm-check input{margin-top:3px;flex:none}

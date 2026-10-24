@@ -1,7 +1,7 @@
 /* Pure presentation-side projection. Database RPC is the authoritative financial write engine.
  * Monetary inputs are centavos; never mutate the source arrays. */
 type Row = Record<string, any>;
-export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];loan_corrections?:Row[];baseline?:Row|null;};
+export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];loan_corrections?:Row[];cash_allocations?:Row[];baseline?:Row|null;};
 const val=(r:Row,key:string)=>Number(r[key]||0);
 const pesos=(c:number)=>Math.round(c)/100;
 const rounded=(n:number)=>Math.round(n*100)/100;
@@ -77,7 +77,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
       principal:pesos(val(l,'principal_cents')),interest:pesos(val(l,'interest_cents')),payable:pesos(val(l,'payable_cents')),
       paid:pesos(paid.amount),paid_principal:pesos(paid.principal),paid_interest:pesos(paid.interest),
       principal_outstanding:voided?0:pesos(Math.max(0,outstanding)),gross_outstanding:voided?0:pesos(Math.max(0,gross)),
-      remaining_interest:voided?0:pesos(Math.max(0,remainingInterest)),voided_on:voidRecord?dateOnly(voidRecord.voided_on):null,void_reason:voidRecord?.reason??null,overdue:pesos(overdueCents),days_past_due:oldest?daysBetween(oldest,asOf):0,
+      remaining_interest:voided?0:pesos(Math.max(0,remainingInterest)),voided_on:voidRecord?dateOnly(voidRecord.voided_on):null,void_reason:voidRecord?.reason??null,void_kind:voidRecord?.void_kind??'Test void',void_cash_disposition:voidRecord?.cash_disposition??null,overdue:pesos(overdueCents),days_past_due:oldest?daysBetween(oldest,asOf):0,
       monthly_rate:Number(l.monthly_rate),status,schedule:scheduled,extensions:extByLoan.get(l.id)||[]};
   }).sort((a,b)=>String(b.release_date).localeCompare(String(a.release_date))||String(b.id).localeCompare(String(a.id)));
   const activeContracts=enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided');
@@ -205,7 +205,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const activity:Row[]=[];
   for(const p of payments)activity.push({id:p.id,date:dateOnly(p.paid_on),title:`Payment · ${byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown'}`,subtitle:`${p.loan_id} · ${p.method}`,kind:'Collection',amount:pesos(val(p,'amount_cents')),loan_id:p.loan_id});
   for(const l of enriched)activity.push({id:l.id,date:dateOnly(l.release_date),title:`Loan release · ${l.borrower_name}`,subtitle:l.product_name,kind:'Release',amount:-l.principal,loan_id:l.id});
-  for(const v of voids)activity.push({id:'VOID-'+v.loan_id,date:dateOnly(v.voided_on),title:`Void test loan · ${byId.get(loans.find(l=>l.id===v.loan_id)?.borrower_id)?.name||'Unknown'}`,subtitle:`${v.loan_id} · release reversal`,kind:'Loan void',amount:pesos(val(v,'principal_cents')),loan_id:v.loan_id});
+  for(const v of voids)activity.push({id:'VOID-'+v.loan_id,date:dateOnly(v.voided_on),title:`${v.void_kind==='Cancellation'?'Loan cancelled':'Void test loan'} · ${byId.get(loans.find(l=>l.id===v.loan_id)?.borrower_id)?.name||'Unknown'}`,subtitle:`${v.loan_id} · release reversal`,kind:'Loan void',amount:pesos(val(v,'principal_cents')),loan_id:v.loan_id});
   for(const c of capital)activity.push({id:c.id,date:dateOnly(c.occurred_on),title:'Capital infusion',subtitle:c.source_type,kind:'Capital',amount:pesos(val(c,'amount_cents'))});
   for(const o of outflows)activity.push({id:o.id,date:dateOnly(o.occurred_on),title:o.description||o.classification,subtitle:o.classification,kind:'Outflow',amount:-pesos(val(o,'amount_cents'))});
   activity.sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.id).localeCompare(String(a.id)));
@@ -220,6 +220,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   for(const p of payments){if(p.source_ref&&refs.has(p.source_ref))exceptions.push(`${p.id}: duplicate imported source receipt ${p.source_ref}`);if(p.source_ref)refs.set(p.source_ref,p.id);}
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
     loan_corrections:input.loan_corrections||[], // expose restatement history even in earlier as-of views
+    cash_allocations:(input.cash_allocations||[]).filter(a=>dateOnly(a.occurred_on)<=asOf),
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
     monthly,asset_bridge:assetBridge,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,

@@ -1,0 +1,23 @@
+{
+  "version": "3.4.0",
+  "title": "Audited loan cancellation",
+  "base_version": "3.3.0",
+  "migration": "supabase/migrations/202610240001_cancel_loans.sql",
+  "required_changed_files": [
+    "app/api/[...path]/route.ts",
+    "app/studio/premium.css",
+    "lib/ledger.ts",
+    "public/studio-app.js",
+    "package.json",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "required_new_files": [
+    "supabase/migrations/202610240001_cancel_loans.sql",
+    "tests/loan-cancellation.test.mjs",
+    "UPGRADE_V3_4_CANCEL_LOAN.md",
+    "V3_4_RELEASE_MANIFEST.json"
+  ],
+  "migration_notes": "Additive. No existing loans or receipts are deleted. Requires existing loan_voids, cash_allocations and loan_extensions tables.",
+  "security_notes": "Owner-only cancellation. Requires settled real-world funds, zero unmatched receipts, duplicate-void prevention, and audit evidence."
+}
