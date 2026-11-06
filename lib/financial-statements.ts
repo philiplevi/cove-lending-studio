@@ -45,7 +45,7 @@ export function assetSourcePosition(s:StatementSnapshot){
  if(netOwnerCapital<0)flags.push('Net owner contributions are negative: recorded owner drawings exceed owner contributions. This does not mean assets are owned by someone else.');
  if(unknownFunding||unclassifiedOutflows)flags.push('Unclassified funding or outflows are included in the reconciliation balance until assigned to an appropriate category.');
  if(residual)flags.push('A reconciliation balance remains. It is not presumed to be lending profit or owner money.');
- const result={portfolio_assets:toPeso(portfolioAssets),owner_contributions:toPeso(ownerContributions),owner_draws:toPeso(ownerDraws),net_owner_capital:toPeso(netOwnerCapital),
+ const result={portfolio_assets:toPeso(portfolioAssets),gross_capital_infusion:toPeso(sum(capital)),owner_contributions:toPeso(ownerContributions),owner_draws:toPeso(ownerDraws),net_owner_capital:toPeso(netOwnerCapital),
   external_funding:toPeso(borrowedFunds),external_repayments:toPeso(borrowedRepayments),external_liability:toPeso(remainingBorrowed),
   interest_received:toPeso(earnedInterest),operating_expenses:toPeso(operatingExpenses),financing_costs:toPeso(financingCosts),
   retained_cash_earnings:toPeso(retainedEarnings),unclassified_funding:toPeso(unknownFunding),unclassified_outflows:toPeso(unclassifiedOutflows),

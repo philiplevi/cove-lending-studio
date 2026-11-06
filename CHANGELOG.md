@@ -1,3 +1,10 @@
+## V3.7 — Owner capital sources and optional verified legacy allocation repair
+
+- Compact gross capital -> borrowed capital -> owner withdrawals -> net owner capital breakdown.
+- Signed asset-source bars for retained earnings, external debt, and net owner position; no misleading negative pie share.
+- Optional, guarded ₱8 historical receipt allocation reclassification with read-only preview and per-receipt audit log. No automatic database writes.
+- Keeps live ledger checking; the dashboard does not present the tiny legacy residual as an ownership category.
+
 ## 3.6.0 — Live Integrity & Interest Drilldown
 
 - Replaced frozen workbook-to-live comparison on Data Integrity Center with as-of live transaction consistency checks and actionable receipt / loan allocation issues.

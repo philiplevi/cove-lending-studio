@@ -1,0 +1,29 @@
+{
+  "product": "Cove Lending Studio",
+  "version": "3.7.0",
+  "base_version": "3.6.0",
+  "scope": "owner capital explanation, signed asset-funding chart, optional historical receipt reallocation",
+  "changed_files": [
+    "package.json",
+    "lib/financial-statements.ts",
+    "public/studio-app.js",
+    "app/studio/asset-sources.css",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "new_files": [
+    "tests/v37-owner-asset-sources.test.mjs",
+    "sql/legacy_8_allocation_preview.sql",
+    "sql/legacy_8_allocation_apply_REVIEW_FIRST.sql",
+    "UPGRADE_V3_7.md",
+    "V3_7_RELEASE_MANIFEST.json"
+  ],
+  "database_schema_migration_required": false,
+  "automatic_financial_data_changes": false,
+  "optional_manually_approved_data_correction": {
+    "preview": "sql/legacy_8_allocation_preview.sql",
+    "apply": "sql/legacy_8_allocation_apply_REVIEW_FIRST.sql",
+    "effect": "Shift ₱1 of principal allocation to interest for eight verified historical receipts; gross amounts and cash unchanged; inserts audit_log entries",
+    "requirements": "restorable backup, eight READY preview rows, review of source documents, staging test, explicit owner approval"
+  }
+}

@@ -135,21 +135,44 @@ function monthlyCollection(asof){return UI.data.monthly.find(x=>x.month===asof.s
 function assetSourceMix(){
  const m=UI.data.asset_sources;
  if(!m)return '';
- const items=[
-  {label:'Net owner capital',amount:m.net_owner_capital,color:'#0b766e'},
-  {label:'Retained lending earnings',amount:m.retained_cash_earnings,color:'#17b5a5'},
-  {label:'Borrowed funding',amount:m.external_liability,color:'#84a8c4'},
-  {label:'Unclassified balance',amount:m.reconciliation_balance,color:'#c99f58'}
+ const gross=Number(m.gross_capital_infusion||0),borrowed=Number(m.external_funding||0),draws=Number(m.owner_draws||0),unknown=Number(m.unclassified_funding||0);
+ const netOwner=Number(m.net_owner_capital||0),earnings=Number(m.retained_cash_earnings||0),debt=Number(m.external_liability||0);
+ const rows=[
+  {label:'Retained lending earnings',amount:earnings,color:'#12a995',kind:'earned'},
+  {label:'Outstanding borrowed capital',amount:debt,color:'#7f9fb5',kind:'borrowed'},
+  {label:'Net owner capital',amount:netOwner,color:'#086e64',kind:'owner'}
  ];
- const canMix=m.breakdown_valid&&Number(m.portfolio_assets)>0;
- const positive=items.filter(i=>i.amount>0);
- const share=(n)=>m.portfolio_assets>0?(100*n/m.portfolio_assets):0;
- const donut=canMix?`<div class="v35-mix-donut" role="img" aria-label="Portfolio assets divided into owner capital, retained lending earnings, borrowed funding and reconciliation amounts" style="background:conic-gradient(${(()=>{let last=0;return positive.map(i=>{const a=last;last+=share(i.amount);return `${i.color} ${a}% ${last}%`}).join(',')})()})"><div><strong>${fmt(m.portfolio_assets)}</strong><span>Total assets</span></div></div>`:
-  `<div class="v35-net-position"><span class="v35-net-pill">${icon('info')} ${m.net_owner_capital<0?'Owner drawings exceed contributions':'Signed source balances'}</span><strong>${fmt(m.net_owner_capital)}</strong><small>Net contributed capital after owner withdrawals.</small></div>`;
- return `<section class="v35-source panel" aria-label="Asset Source Mix">
- <div class="v35-source-head"><div><span class="v31-eyebrow">ASSET OWNERSHIP & SOURCES</span><h2>Asset source mix</h2><p>Owner capital, earnings and other funding.</p></div></div>
- <div class="v35-source-body">${donut}<div class="v35-source-breakdown">${items.map(i=>`<div class="v35-source-line"><span class="v35-color" style="background:${i.color}"></span><span class="v35-source-label"><b>${i.label}</b></span><strong class="${i.amount<0?'v35-negative':''}">${fmt(i.amount)}</strong>${canMix?`<span class="v35-source-percent">${share(i.amount).toFixed(1)}%</span>`:''}</div>`).join('')}</div></div>
- ${m.flags.length?`<div class="v36-source-note">${icon('alert-triangle')} ${m.flags.length} item(s) for review in Data integrity.</div>`:''}
+ const scale=Math.max(1,...rows.map(r=>Math.abs(r.amount)));
+ const bars=rows.map(r=>{
+   const percent=Math.min(100,Math.abs(r.amount)/scale*100);
+   return `<div class="v37-source-chart-row">
+    <div class="v37-source-chart-label"><span class="v37-source-dot" style="background:${r.color}"></span><b>${r.label}</b><strong class="${r.amount<0?'v37-negative':''}">${fmt(r.amount)}</strong></div>
+    <div class="v37-diverging-bar" role="img" aria-label="${esc(r.label)} ${r.amount<0?'negative ':''}${fmt(r.amount)}">
+     <div class="v37-bar-negative">${r.amount<0?`<span style="width:${percent}%" class="v37-bar-fill" title="${esc(r.label)} ${fmt(r.amount)}"></span>`:''}</div>
+     <div class="v37-bar-positive">${r.amount>0?`<span style="width:${percent}% ;background:${r.color}" class="v37-bar-fill" title="${esc(r.label)} ${fmt(r.amount)}"></span>`:''}</div>
+    </div>
+   </div>`;
+ }).join('');
+ const extra=unknown?`<div class="v37-formula-row"><span>Less unclassified funding</span><strong>−${fmt(unknown)}</strong></div>`:'';
+ const balanceFoot=netOwner<0?`<p class="v37-owner-negative-note">Owner withdrawals exceed personal contributions by ${fmt(-netOwner)}.</p>`:'';
+ return `<section class="v35-source v37-source panel" aria-label="Asset source mix and owner capital calculation">
+  <div class="v35-source-head"><div><span class="v31-eyebrow">ASSET OWNERSHIP & SOURCES</span><h2>Asset source mix</h2><p>Where your portfolio funding comes from.</p></div></div>
+  <div class="v37-source-layout">
+   <div class="v37-calculation">
+    <div class="v37-mini-title">NET OWNER CAPITAL</div>
+    <div class="v37-formula-row"><span>Capital infusion <small>(including borrowed)</small></span><strong>${fmt(gross)}</strong></div>
+    <div class="v37-formula-row"><span>Less borrowed capital <small>(original amount)</small></span><strong>−${fmt(borrowed)}</strong></div>
+    ${extra}
+    <div class="v37-formula-row"><span>Less owner withdrawals</span><strong>−${fmt(draws)}</strong></div>
+    <div class="v37-formula-total"><span>Net owner capital</span><strong class="${netOwner<0?'v37-negative':''}">${fmt(netOwner)}</strong></div>
+    ${balanceFoot}
+   </div>
+   <div class="v37-composition">
+    <div class="v37-composition-head"><div><div class="v37-mini-title">CURRENT ASSET FUNDING</div><span>Cash + outstanding principal</span></div><strong>${fmt(m.portfolio_assets)}</strong></div>
+    <div class="v37-diverging-legend"><span>Withdrawn beyond capital <i></i> 0 <i></i> Funds supporting assets</span></div>
+    <div class="v37-source-chart">${bars}</div>
+   </div>
+  </div>
  </section>`;
 }
 function capitalSnapshot(){

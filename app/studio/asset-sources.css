@@ -83,3 +83,34 @@
 .v36-integrity-foot{font-size:11px;color:#75898c;margin:2px 0 22px;line-height:1.6}
 @media(max-width:900px){.v36-integrity-sections{grid-template-columns:1fr}}
 @media(max-width:700px){.v36-check-grid{grid-template-columns:1fr}.v36-integrity-summary{align-items:flex-start;flex-direction:column}.v36-check-panel,.v36-integrity-exceptions,.v36-integrity-journal{padding:17px}}
+
+/* V3.7 — compact, auditable owner-capital waterfall and signed funding chart. */
+.v37-source{padding:24px 25px;container-type:inline-size}
+.v37-source-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:20px;align-items:stretch}
+.v37-calculation{background:#f5faf8;border:1px solid #e0ebe8;border-radius:15px;padding:17px 17px 14px;min-width:0}
+.v37-mini-title{font-size:10px;font-weight:900;letter-spacing:1.4px;color:#0a796d;margin-bottom:12px}
+.v37-formula-row{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #e1ebe7;padding:10px 0;font-size:12px;color:#536e75}
+.v37-formula-row span{line-height:1.4}.v37-formula-row small{display:block;color:#81979a;font-size:10px;margin-top:2px}
+.v37-formula-row strong{white-space:nowrap;font-size:12px;color:#20454c;font-variant-numeric:tabular-nums}
+.v37-formula-total{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#e4f2ee;border:1px solid #cae5db;border-radius:11px;padding:12px;margin-top:12px;color:#0c5049;font-size:13px;font-weight:800}
+.v37-formula-total strong{font-size:20px;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.v37-negative{color:#bf6656!important}
+.v37-owner-negative-note{margin:11px 1px 0!important;font-size:11px!important;line-height:1.5!important;color:#8b615b!important}
+.v37-composition{padding:14px 5px 8px;min-width:0}
+.v37-composition-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.v37-composition-head .v37-mini-title{margin:0 0 6px}.v37-composition-head span{font-size:10px;color:#789096}
+.v37-composition-head strong{white-space:nowrap;font-size:21px;letter-spacing:-.4px;color:#163d43;font-variant-numeric:tabular-nums}
+.v37-diverging-legend{margin:24px 0 13px;color:#789095;font-size:9px;text-align:center}
+.v37-diverging-legend i{border-top:1px solid #b8c9c6;display:inline-block;width:12px;vertical-align:middle;margin:0 5px}
+.v37-source-chart-row{margin:0 0 17px}
+.v37-source-chart-label{display:flex;align-items:center;gap:7px;font-size:11px;color:#24505a;margin-bottom:8px;min-width:0}
+.v37-source-chart-label>b{font-weight:700;flex:1;min-width:0}
+.v37-source-chart-label strong{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:11px;color:#163d43}
+.v37-source-dot{width:8px;height:8px;flex:none;border-radius:3px}
+.v37-diverging-bar{display:grid;grid-template-columns:25% 75%;gap:0;height:10px;border-radius:3px;overflow:hidden}
+.v37-bar-negative,.v37-bar-positive{position:relative;display:flex;background:#eef4f3}
+.v37-bar-negative{justify-content:flex-end;border-right:1px solid #93afac}
+.v37-bar-positive{justify-content:flex-start}
+.v37-bar-fill{display:block;min-width:2px;border-radius:3px;min-height:10px;background:#c07968}
+@container (max-width:800px){.v37-source-layout{grid-template-columns:1fr;gap:13px}.v37-composition{padding:8px 2px}.v37-diverging-legend{margin-top:16px}}
+@media(max-width:700px){.v37-source{padding:18px}.v37-formula-total strong{font-size:18px}.v37-composition-head strong{font-size:18px}.v37-composition-head{flex-wrap:wrap}}

@@ -1,3 +1,5 @@
+> V3.7: dashboard Asset Source Mix now provides transparent owner capital calculation and signed funding sources. Optional audited legacy ₱8 allocation repair is documented in [UPGRADE_V3_7.md](UPGRADE_V3_7.md). It does not run on deployment.
+
 # Cove Lending Studio V3.4 — Owner-controlled Loan Cancellation
 
 **New:** Loans → open any non-voided loan → **Cancel loan**. Requires a verifiable cash outcome, zero unreversed receipts, and an audit reason. Imported loans require explicit historical-reconciliation acknowledgement. Cancellation writes a dated contra-release; no financial rows are hard-deleted.
