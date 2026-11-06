@@ -50,7 +50,7 @@ test('Dashboard exposes relevant lending measures and definitions with no second
  const js=readFileSync(new URL('../public/studio-app.js',import.meta.url),'utf8');
  const css=readFileSync(new URL('../app/studio/executive.css',import.meta.url),'utf8');
  const page=readFileSync(new URL('../app/studio/page.tsx',import.meta.url),'utf8');
- for(const label of ['TOTAL PORTFOLIO ASSETS','MONTHLY CONTRACTUAL INTEREST','FINAL SCHEDULED DUE DATE','Portfolio quality','PAR30','Collection coverage','Collections to prioritize','Cash withdrawn / spent'])assert.ok(js.includes(label),`Missing ${label}`);
+ for(const label of ['TOTAL PORTFOLIO ASSETS','MONTHLY CONTRACTUAL INTEREST','FINAL SCHEDULED DUE DATE','Portfolio quality','PAR30','Collection coverage','Collections to prioritize'])assert.ok(js.includes(label),`Missing ${label}`);
  assert.match(js,/s\.principal_at_risk_30/);assert.match(js,/s\.par30_pct/);assert.match(js,/s\.scheduled_final_collection_date/);
  assert.match(css,/\.v31-metric-grid/);assert.match(css,/@media\(max-width:620px\)/);assert.match(css,/:focus-visible/);
  assert.match(page,/import '\.\/executive\.css';/);

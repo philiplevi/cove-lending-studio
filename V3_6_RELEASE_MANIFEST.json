@@ -1,0 +1,27 @@
+{
+  "version": "3.6.0",
+  "base": "3.5.0",
+  "migration_required": false,
+  "dependency_changes": false,
+  "financial_transactions_modified": false,
+  "new_api_write_paths": false,
+  "changed_and_added_files": [
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "lib/ledger.ts",
+    "public/studio-app.js",
+    "app/studio/asset-sources.css",
+    "tests/ui-contract.test.mjs",
+    "tests/executive-dashboard.test.mjs",
+    "tests/v36-live-controls.test.mjs",
+    "UPGRADE_V3_6.md",
+    "V3_6_RELEASE_MANIFEST.json"
+  ],
+  "notes": [
+    "live ledger self-checks replace dynamic workbook-baseline comparisons",
+    "historical overallocations and source reference collisions remain visible",
+    "interest breakdown follows active loans at selected as-of date",
+    "source mix and scheduled interest cards have no financial statement links"
+  ]
+}

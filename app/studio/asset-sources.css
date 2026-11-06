@@ -36,3 +36,50 @@
 @media(max-width:1200px){.v35-dashboard-funding{grid-template-columns:1fr}.v35-contract-block .v31-earnings-grid{display:grid;grid-template-columns:1fr 1fr}.v35-source-body{gap:20px}}
 @media(max-width:700px){.v35-source-head,.v35-contract-heading{flex-wrap:wrap}.v35-source{padding:19px}.v35-source-body{flex-direction:column;align-items:stretch}.v35-mix-donut,.v35-net-position{align-self:center}.v35-contract-block .v31-earnings-grid{display:flex;flex-direction:column}.v35-source-line{grid-template-columns:9px minmax(0,1fr) auto;gap:8px}.v35-source-percent{grid-column:3}.v35-source-head h2,.v35-contract-heading h2{font-size:19px}}
 .v35-historical{border-top:1px solid #e6efee;margin-top:12px;padding-top:11px;font-size:11px;color:#526f77}.v35-historical summary{cursor:pointer;font-weight:750}.v35-historical p{line-height:1.55}
+
+/* V3.6: compact dashboard sources and drill-down interest table. */
+.v35-source-line{padding:10px 0;align-items:center}.v35-source-line .v35-color{margin-top:0}
+.v35-source-line .v35-source-label b{font-size:12px}.v35-source-head{margin-bottom:11px}
+.v36-source-note{margin-top:12px;color:#805f3d;font-size:11px;font-weight:650;display:flex;align-items:center;gap:7px}
+.v36-source-note svg{width:15px;height:15px;flex:none}
+.v36-interest-details{margin-top:14px;border:1px solid #d9e9e7;border-radius:13px;overflow:hidden;background:#f8fbfa}
+.v36-interest-details summary{cursor:pointer;display:flex;align-items:center;gap:10px;padding:13px 15px;font-size:12px;font-weight:800;color:#0b655e;list-style:none}
+.v36-interest-details summary::-webkit-details-marker{display:none}
+.v36-interest-details summary svg{width:17px;height:17px;flex:none}
+.v36-interest-details summary span{flex:1;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.v36-interest-details summary small{font-size:10px;font-weight:600;color:#6c8588}
+.v36-interest-details summary>svg:last-child{transition:transform .2s}
+.v36-interest-details[open] summary>svg:last-child{transform:rotate(90deg)}
+.v36-interest-details summary:hover,.v36-interest-details summary:focus-visible{background:#e8f5f2}
+.v36-interest-details summary:focus-visible{outline:2px solid #168a7b;outline-offset:-3px}
+.v36-interest-table-wrap{overflow-x:auto;border-top:1px solid #e1efec}
+.v36-interest-table{border-collapse:collapse;width:100%;min-width:520px;font-size:11px}
+.v36-interest-table th{text-align:left;color:#6d858a;font-size:10px;letter-spacing:.04em;text-transform:uppercase;background:#f4faf8}
+.v36-interest-table td,.v36-interest-table th{padding:11px 13px;border-bottom:1px solid #e5eeed}
+.v36-interest-table td:not(:first-child),.v36-interest-table th:not(:first-child){text-align:right;white-space:nowrap}
+.v36-interest-table td small{display:block;margin-top:4px;color:#729097;font-size:10px}
+.v36-interest-table tfoot th{color:#0e4e49;background:#e8f5f1;font-size:11px;letter-spacing:0;text-transform:none}
+.v36-interest-caption{font-size:10px!important;line-height:1.5!important;color:#6f898d!important;padding:8px 13px 11px;margin:0!important}
+/* Live data integrity page; no comparisons against frozen import totals. */
+.v36-integrity-summary{padding:23px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px!important}
+.v36-integrity-summary strong{display:block;font-size:27px;color:#0f3640;margin:7px 0}
+.v36-integrity-summary p{color:#70868b;font-size:12px;margin:0}
+.v36-integrity-badges{display:flex;gap:7px;flex-wrap:wrap}
+.v36-integrity-badges span{background:#edf7f5;color:#266b65;border-radius:99px;padding:7px 10px;font-size:10px;font-weight:750}
+.v36-check-panel,.v36-integrity-exceptions,.v36-integrity-journal{padding:23px 27px;margin-bottom:18px}
+.v36-head h3{font-size:18px;margin:0 0 5px;color:#173741}
+.v36-head p{font-size:12px;color:#758b8e;margin:0 0 18px;line-height:1.5}
+.v36-check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.v36-check{border:1px solid #e1e9e7;border-radius:12px;display:flex;gap:12px;padding:15px;align-items:flex-start}
+.v36-check-icon{color:#0d8875;flex:none}.v36-check-review .v36-check-icon{color:#bd793b}.v36-check-icon svg{width:20px;height:20px}
+.v36-check>span:nth-child(2){flex:1;min-width:0}.v36-check strong{display:block;color:#153f46;font-size:12px}.v36-check small{display:block;color:#7a8e91;font-size:10px;line-height:1.5;margin-top:4px}
+.v36-check-status{font-size:10px;white-space:nowrap;font-weight:800;color:#087968;background:#e9f7f2;border-radius:7px;padding:5px 7px}
+.v36-check-review .v36-check-status{background:#fff4e6;color:#ad682d}
+.v36-integrity-sections{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px}
+.v36-integrity-exceptions h4{font-size:12px;margin:16px 0 8px;color:#6c5b46}
+.v36-table-wrap{overflow-x:auto}.v36-table-wrap table{min-width:460px}
+.v36-ref-line{display:flex;gap:10px;align-items:center;justify-content:space-between;border-bottom:1px solid #edf2f1;padding:10px 0;font-size:12px}.v36-ref-line small{font-size:10px;color:#6f8589}
+.v36-clean{border-radius:11px;padding:22px;background:#ebf7f1;color:#0d735f;font-weight:700;font-size:12px}
+.v36-integrity-foot{font-size:11px;color:#75898c;margin:2px 0 22px;line-height:1.6}
+@media(max-width:900px){.v36-integrity-sections{grid-template-columns:1fr}}
+@media(max-width:700px){.v36-check-grid{grid-template-columns:1fr}.v36-integrity-summary{align-items:flex-start;flex-direction:column}.v36-check-panel,.v36-integrity-exceptions,.v36-integrity-journal{padding:17px}}

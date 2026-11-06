@@ -82,6 +82,14 @@ export function buildState(input:LedgerDataset,asOf:string) {
       monthly_rate:Number(l.monthly_rate),status,schedule:scheduled,extensions:extByLoan.get(l.id)||[]};
   }).sort((a,b)=>String(b.release_date).localeCompare(String(a.release_date))||String(b.id).localeCompare(String(a.id)));
   const activeContracts=enriched.filter(l=>l.status!=='Settled'&&l.status!=='Voided');
+  // Loan-level composition of the flat monthly contractual run-rate. This is
+  // scheduled contract interest, not interest received or accrued in this month.
+  const contractualInterestLoans=activeContracts.map(l=>({
+    loan_id:l.id,borrower_name:l.borrower_name,product_name:l.product_name,
+    principal:l.principal,monthly_rate:Number(l.monthly_rate),
+    monthly_interest:pesos(Math.round(val(l,'principal_cents')*Number(l.monthly_rate))),
+    maturity:l.schedule.reduce((latest:string|null,i:Row)=>!latest||String(i.due_date)>latest?String(i.due_date):latest,null)
+  })).sort((a,b)=>b.monthly_interest-a.monthly_interest||String(a.loan_id).localeCompare(String(b.loan_id)));
   // Contractual maturity is a scheduled date, not a promise that cash will arrive.
   const scheduledFinalCollectionDate=activeContracts.reduce<string|null>((latest,l)=>{
     const dates=l.schedule.map((i:Row)=>i.due_date).filter((d:string)=>/^\d{4}-\d{2}-\d{2}$/.test(d));
@@ -109,7 +117,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
     net_interest_cash:pesos(interestCollected-financingCost),
     // Flat-rate approved monthly contract amount for active loans, not actual
     // interest accrued or money earned and received this calendar month.
-    monthly_interest_run_rate:pesos(activeContracts.reduce((a,l)=>a+Math.round(val(l,'principal_cents')*Number(l.monthly_rate)),0)),
+    monthly_interest_run_rate:rounded(contractualInterestLoans.reduce((a,l)=>a+l.monthly_interest,0)),
     scheduled_final_collection_date:scheduledFinalCollectionDate,
     last_due_is_past:Boolean(scheduledFinalCollectionDate&&scheduledFinalCollectionDate<asOf),
     monthly_funding_interest:pesos(sum(capital.filter(c=>c.source_type==='Loan'&&!['cancelled','closed','repaid'].includes(String(c.status).toLowerCase())),'funding_interest_cents')),
@@ -220,12 +228,43 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const refs=new Map<string,string>();
   for(const p of payments){if(p.source_ref&&refs.has(p.source_ref))exceptions.push(`${p.id}: duplicate imported source receipt ${p.source_ref}`);if(p.source_ref)refs.set(p.source_ref,p.id);}
   const asset_sources=assetSourcePosition({as_of:asOf,summary,capital,outflows});
+  // Always validate the POSTED LIVE TRANSACTIONS for the selected as-of date.
+  // Original workbook totals are archival context only, never a live target.
+  const receiptSplitIssues=payments.filter(p=>val(p,'amount_cents')!==val(p,'principal_cents')+val(p,'interest_cents'));
+  const allocationIssues=enriched.filter(l=>l.status!=='Voided'&&(
+    val(l,'principal_cents')-Math.round(l.paid_principal*100)<0 ||
+    val(l,'interest_cents')-Math.round(l.paid_interest*100)<0 ||
+    val(l,'payable_cents')-Math.round(l.paid*100)<0
+  ));
+  const refList=new Map<string,string[]>();
+  for(const receipt of payments){const ref=String(receipt.source_ref||'').trim();if(!ref)continue;
+    const related=refList.get(ref)||[];related.push(String(receipt.id));refList.set(ref,related);
+  }
+  const duplicateReferences=[...refList].filter(([,ids])=>ids.length>1).map(([reference,ids])=>({reference,ids}));
+  const cashEquation=cap-disb+voidReversals+col-outs;
+  const cashDifference=cashEquation-Math.round(summary.cash*100);
+  const assetEquation=summary.cash+summary.principal_outstanding;
+  const assetDifference=rounded(assetEquation-summary.portfolio_assets);
+  const liveChecks=[
+    {id:'cash',label:'Cashbook rollforward',passed:cashDifference===0,issues:cashDifference===0?0:1,note:'Posted movements agree with calculated cash; not a bank statement reconciliation'},
+    {id:'assets',label:'Portfolio asset equation',passed:Math.abs(assetDifference)<.005,issues:Math.abs(assetDifference)<.005?0:1,note:'Cash plus outstanding principal equals reported portfolio assets'},
+    {id:'receipts',label:'Receipt allocations',passed:receiptSplitIssues.length===0,issues:receiptSplitIssues.length,note:'Receipt principal and interest sum to each receipt amount'},
+    {id:'loan_allocations',label:'Loan allocation limits',passed:allocationIssues.length===0,issues:allocationIssues.length,note:'Detect net receipts allocated beyond contractual balances'},
+    {id:'references',label:'Receipt reference uniqueness',passed:duplicateReferences.length===0,issues:duplicateReferences.length,note:'Repeated external references; distinct internal receipt IDs are preserved'}
+  ];
+  const liveIntegrity={as_of:asOf,checks:liveChecks,
+    clear_checks:liveChecks.filter(c=>c.passed).length,total_checks:liveChecks.length,
+    receipt_split_issues:receiptSplitIssues.map(p=>({receipt_id:p.id,loan_id:p.loan_id,amount:pesos(val(p,'amount_cents')),allocated:pesos(val(p,'principal_cents')+val(p,'interest_cents'))})),
+    allocation_issues:allocationIssues.map(l=>({loan_id:l.id,borrower_name:l.borrower_name,principal_over:rounded(Math.max(0,l.paid_principal-l.principal)),interest_over:rounded(Math.max(0,l.paid_interest-l.interest)),gross_over:rounded(Math.max(0,l.paid-l.payable))})),
+    duplicate_references:duplicateReferences,
+    cash_difference:pesos(cashDifference),asset_difference:assetDifference
+  };
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
     loan_corrections:input.loan_corrections||[], // expose restatement history even in earlier as-of views
     cash_allocations:(input.cash_allocations||[]).filter(a=>dateOnly(a.occurred_on)<=asOf),
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
-    monthly,asset_bridge:assetBridge,asset_sources,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,
+    monthly,asset_bridge:assetBridge,asset_sources,contractual_interest_loans:contractualInterestLoans,live_integrity:liveIntegrity,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,
     upcoming:upcoming.sort((a,b)=>a.due_date.localeCompare(b.due_date)),activity,reconciliation,exceptions,
     audit_log:(input.audit_log||[]).map(a=>({...a,actor:a.actor_id?'Owner':'System',occurred_at:a.occurred_at||new Date().toISOString()})),
     data_source:input.baseline?.source_name||'Live workspace'};

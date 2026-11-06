@@ -1,3 +1,11 @@
+## 3.6.0 — Live Integrity & Interest Drilldown
+
+- Replaced frozen workbook-to-live comparison on Data Integrity Center with as-of live transaction consistency checks and actionable receipt / loan allocation issues.
+- Retained audit history and duplicate source reference warnings, without treating routine post-import transactions as reconciliation errors.
+- Simplified Asset Source Mix and removed redundant Financial Statements links from dashboard cards.
+- Added a loan-level expandable breakdown of monthly flat contractual interest; totals tie to the headline and respond to as-of changes.
+- No new migration, financial writes or dependencies.
+
 # Changelog
 
 ## 3.5.0 — Asset Source Mix and Financial Statements

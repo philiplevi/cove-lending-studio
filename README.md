@@ -147,3 +147,6 @@ The executive dashboard now includes a read-only **Factors increasing assets** c
 **Financial Statements**: Open the Financial Statements sidebar module (`/studio/statements`). Toggle Monthly, Quarterly, Yearly or Custom periods. Choose Income Statement, Cash Flow Statement or Statement of Financial Position; export CSV or use browser Print/Save as PDF. Reports are generated from two authenticated ledger snapshots, with statement-of-position amounts as of the selected period end.
 
 These are cash-basis **management** statements, not audited or PFRS-compliant statements. Accrued interest, expected losses, income taxes and other liabilities that were not posted are not recognized. Mixed/unclassified cash movements remain disclosed; do not treat them automatically as profit or owner withdrawals.
+
+### V3.6 release notes
+The Data Integrity Center uses posted transaction checks at the selected as-of date rather than current-vs-original-import differences. It does not substitute for bank statement reconciliation. The dashboard's monthly contractual interest section has an expandable loan-level breakdown; Financial Statements remain in the independent sidebar module. See `UPGRADE_V3_6.md`.
