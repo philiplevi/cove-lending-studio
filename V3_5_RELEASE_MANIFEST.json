@@ -1,0 +1,26 @@
+{
+  "version": "3.5.0",
+  "base": "3.4.0",
+  "migration_required": false,
+  "new_database_objects": [],
+  "dependency_changes": false,
+  "changed_and_added_files": [
+    "package.json",
+    "tsconfig.json",
+    "README.md",
+    "CHANGELOG.md",
+    "lib/ledger.ts",
+    "lib/financial-statements.ts",
+    "public/studio-app.js",
+    "app/studio/page.tsx",
+    "app/studio/asset-sources.css",
+    "app/studio/statements/page.tsx",
+    "app/studio/statements/statements.css",
+    "tests/financial-statements.test.mjs",
+    "UPGRADE_V3_5.md",
+    "V3_5_RELEASE_MANIFEST.json"
+  ],
+  "security": "Uses existing authenticated /api/state read-only requests; no new write paths",
+  "accounting_basis": "cash-basis management; not statutory PFRS",
+  "notes": "net owner contributions may be negative and reconciliation balances remain explicit"
+}

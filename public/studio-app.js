@@ -46,7 +46,8 @@ const monthLabel=(s)=>new Date(s+'-02T12:00:00').toLocaleDateString('en-US',{mon
 const daysBetween=(from,to)=>Math.round((Date.parse(to+'T12:00:00Z')-Date.parse(from+'T12:00:00Z'))/86400000);
 const initials=s=>String(s||'').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
-const UI={page:'dashboard',data:null,asof:today(),filter:'All',query:'',cashFilter:'All',collectionFilter:'All',scheduleFilter:'Next 7 days',scheduleSearch:'',chartRange:12,assetRange:'all',loanId:null};
+const initialPage=typeof location==='undefined'?'':location.hash.slice(1);
+const UI={page:['dashboard','loans','borrowers','collections','transactions','schedule','reports','controls'].includes(initialPage)?initialPage:'dashboard',data:null,asof:today(),filter:'All',query:'',cashFilter:'All',collectionFilter:'All',scheduleFilter:'Next 7 days',scheduleSearch:'',chartRange:12,assetRange:'all',loanId:null};
 const main=document.getElementById('main');
 const modRoot=document.getElementById('modal-root');
 const drawRoot=document.getElementById('drawer-root');
@@ -131,25 +132,37 @@ function productMix(){const d=UI.data;let groups=d.products.map(p=>({id:p.id,nam
 function upcomingTable(){let list=UI.data.upcoming.slice(0,5);if(!list.length)return `<div class="empty">${icon('check-circle-2')}No upcoming installments on the selected date.</div>`;return `<table class="compact-table"><thead><tr><th>Borrower / Loan</th><th>Due</th><th>Amount</th></tr></thead><tbody>${list.map(x=>`<tr><td><div class="person"><span class="person-icon">${initials(x.borrower)}</span><span><strong>${esc(x.borrower)}</strong><small>${esc(x.loan_id)}</small></span></div></td><td class="muted">${short(x.due_date)}</td><td class="mono">${fmt(x.amount)}</td></tr>`).join('')}</tbody></table>`}
 function activityList(){let list=UI.data.activity.slice(0,5);return list.map(x=>`<div class="activity-row"><span class="activity-symbol ${x.amount<0?'outflow':''}">${icon(x.amount>=0?'arrow-down-left':'arrow-up-right')}</span><span class="activity-data"><strong>${esc(x.title)}</strong><small>${short(x.date)} &nbsp;·&nbsp; ${esc(x.subtitle)}</small></span><span class="activity-amount ${x.amount<0?'minus':''}">${x.amount<0?'-':'+'}${fmt(Math.abs(x.amount))}</span></div>`).join('')}
 function monthlyCollection(asof){return UI.data.monthly.find(x=>x.month===asof.slice(0,7))?.collections||0;}
-function capitalSnapshot(){
- const s=UI.data.summary;
+function assetSourceMix(){
+ const m=UI.data.asset_sources;
  const sourceInterest=(UI.data.reconciliation||[]).find(r=>r.name==='Interest collected · dashboard');
- const referenceDifference=sourceInterest?Math.abs(Number(sourceInterest.variance||0)):0;
- const cost=s.monthly_funding_interest;
- return `<section class="v31-capital-block" aria-label="Capital and earnings">
- <div class="v31-block-heading"><div><span class="v31-eyebrow">CAPITAL & EARNINGS</span><h2>Your lending capital, clearly explained</h2><p>Contracted returns, cash actually received, and capital currently employed.</p></div><button class="v31-text-button" data-page="reports">View financial insights ${icon('arrow-right')}</button></div>
- <div class="v31-earnings-grid">
-  <div class="v31-earnings-feature"><div class="v31-feature-decor" aria-hidden="true"></div><div class="v31-overline">${icon('circle-dollar-sign')} MONTHLY CONTRACTUAL INTEREST</div><div class="v31-feature-value">${fmt(s.monthly_interest_run_rate)}</div><p>Flat monthly interest stipulated in your active loan agreements. <strong>Not yet collected income.</strong></p><div class="v31-feature-foot"><span class="v31-mini-dot"></span> ${s.active_loans} active contracts · ${short(UI.asof)}</div></div>
-  <div class="v31-maturity-feature"><div class="v31-overline">${icon('calendar-days')} FINAL SCHEDULED DUE DATE</div><div class="v31-maturity-value">${s.scheduled_final_collection_date?short(s.scheduled_final_collection_date):'No open loans'}</div><p>${s.last_due_is_past?'Latest contractual maturity has passed; outstanding collections require follow-up.':'Latest due date among unpaid loan contracts. Actual collection may differ.'}</p><button data-page="schedule" class="v31-maturity-link">Open collection planner ${icon('arrow-right')}</button></div>
- </div>
- <div class="v31-balance-sheet" aria-label="Capital summary">
-   <div class="v31-balance-head"><div><span class="v31-eyebrow">FINANCIAL POSITION</span><h3>Capital summary</h3></div><div class="v31-utilization-inline"><span>${Number(s.capital_deployed_pct).toFixed(2)}% deployed</span><div class="v31-mini-track"><i style="width:${Math.max(0,Math.min(100,s.capital_deployed_pct))}%"></i></div></div></div>
-   <div class="v31-amount-grid"><div class="v31-fin-amount"><span>Capital introduced</span><strong>${fmt(s.capital)}</strong><small>Cumulative contributions</small></div><div class="v31-fin-amount"><span>Interest received</span><strong>${fmt(s.interest_collected)}</strong><small>Cash basis · all time</small></div><div class="v31-fin-amount"><span>Cash withdrawn / spent</span><strong>${fmt(s.outflows)}</strong><small>Includes drawings; not all expenses</small></div><div class="v31-fin-amount v31-fin-emphasis"><span>Portfolio assets</span><strong>${fmt(s.portfolio_assets)}</strong><small>Cash + outstanding principal</small></div></div>
- </div>
- <div class="v31-finance-foot"><span>${icon('info')} Interest financing cost: <strong>${cost?fmt(cost)+'/month':'Not recorded'}</strong></span><details class="v31-history"><summary>Historical variance & definitions ${icon('chevrons-up-down')}</summary><p>${sourceInterest?`Original spreadsheet interest reference: <strong>${fmt(sourceInterest.book)}</strong>. Recomputed receipt-ledger interest: <strong>${fmt(s.interest_collected)}</strong>. Difference: <strong>${fmt(referenceDifference)}</strong>.`: 'No imported interest baseline available.'} Historical figures are retained unchanged; your cash and loan balances come from posted transactions, not the spreadsheet summary. <button class="panel-link" data-page="controls">Review reconciliation</button>.</p></details></div>
+ if(!m)return '';
+ const items=[
+  {label:'Net owner capital',amount:m.net_owner_capital,color:'#0b766e',help:'Personal capital contributions less owner withdrawals. May be negative.'},
+  {label:'Retained lending earnings',amount:m.retained_cash_earnings,color:'#17b5a5',help:'Interest actually received less classified operating and financing expenses (cash basis).'},
+  {label:'Borrowed funding outstanding',amount:m.external_liability,color:'#84a8c4',help:'External funding received less recorded principal repayments.'},
+  {label:'Unclassified / reconciliation',amount:m.reconciliation_balance,color:'#c99f58',help:'Historical allocation variances or unclassified cash movement. Not treated as profit.'}
+ ];
+ const canMix=m.breakdown_valid&&Number(m.portfolio_assets)>0;
+ const positive=items.filter(i=>i.amount>0);
+ const share=(n)=>m.portfolio_assets>0?(100*n/m.portfolio_assets):0;
+ const donut=canMix?`<div class="v35-mix-donut" role="img" aria-label="Portfolio assets divided into owner capital, retained lending earnings, borrowed funding and reconciliation amounts" style="background:conic-gradient(${(()=>{let last=0;return positive.map(i=>{const a=last;last+=share(i.amount);return `${i.color} ${a}% ${last}%`}).join(',')})()})"><div><strong>${fmt(m.portfolio_assets)}</strong><span>Total assets</span></div></div>`:
+  `<div class="v35-net-position"><span class="v35-net-pill">${icon('info')} Net owner capital may be negative</span><strong>${fmt(m.net_owner_capital)}</strong><small>We show actual signed balances instead of an inaccurate ownership percentage.</small></div>`;
+ return `<section class="v35-source panel" aria-label="Asset Source Mix">
+ <div class="v35-source-head"><div><span class="v31-eyebrow">ASSET OWNERSHIP & SOURCES</span><h2>Asset source mix</h2><p>What remains of contributed capital versus funds generated through lending.</p></div><a href="/studio/statements" class="v35-inline-link">Financial statements ${icon('arrow-right')}</a></div>
+ <div class="v35-source-body">${donut}<div class="v35-source-breakdown">${items.map(i=>`<div class="v35-source-line"><span class="v35-color" style="background:${i.color}"></span><span class="v35-source-label"><b>${i.label}</b><small>${i.help}</small></span><strong class="${i.amount<0?'v35-negative':''}">${fmt(i.amount)}</strong>${canMix?`<span class="v35-source-percent">${share(i.amount).toFixed(1)}%</span>`:''}</div>`).join('')}</div></div>
+ <div class="v35-source-foot">${icon('info')} <span>Source attribution is a <strong>cash-basis management reconciliation</strong>, not tracing of individual pesos. Cash withdrawn / spent is classified as owner drawings, operating costs, financing costs or debt repayments. ${m.flags.length?`<strong>${m.flags.length} review note(s)</strong> — see Financial Statements.`:'Owner capital and retained earnings reconcile to recorded portfolio assets.'}</span></div>
+ <details class="v35-historical"><summary>Historical variance & definitions</summary><p>${sourceInterest?`Imported spreadsheet interest baseline: <strong>${fmt(sourceInterest.book)}</strong>. Live receipt ledger: <strong>${fmt(UI.data.summary.interest_collected)}</strong>. Variance: <strong>${fmt(sourceInterest.variance)}</strong>.`: 'No frozen imported interest baseline exists.'} Cash and loan balances are computed from posted entries, not from workbook summaries. <button class="panel-link" data-page="controls">Review data integrity</button>.</p></details>
  </section>`;
 }
-
+function capitalSnapshot(){
+ const s=UI.data.summary;
+ return `<section class="v35-contract-block" aria-label="Contract interest and final scheduled collection">
+ <div class="v35-contract-heading"><div><span class="v31-eyebrow">EARNINGS & MATURITY</span><h2>What your active loans are scheduled to earn</h2></div><a href="/studio/statements" class="v35-inline-link">Period statements ${icon('arrow-right')}</a></div>
+ <div class="v31-earnings-grid">
+  <div class="v31-earnings-feature"><div class="v31-feature-decor" aria-hidden="true"></div><div class="v31-overline">${icon('circle-dollar-sign')} MONTHLY CONTRACTUAL INTEREST</div><div class="v31-feature-value">${fmt(s.monthly_interest_run_rate)}</div><p>Flat monthly interest in active loan agreements. <strong>Not yet collected income.</strong></p><div class="v31-feature-foot"><span class="v31-mini-dot"></span> ${s.active_loans} active agreements · ${short(UI.asof)}</div></div>
+  <div class="v31-maturity-feature"><div class="v31-overline">${icon('calendar-days')} FINAL SCHEDULED DUE DATE</div><div class="v31-maturity-value">${s.scheduled_final_collection_date?short(s.scheduled_final_collection_date):'No open loans'}</div><p>${s.last_due_is_past?'The latest contractual maturity has passed. Collectibles still require follow-up.':'Latest contractual due date. Actual payment may occur earlier or later.'}</p><button data-page="schedule" class="v31-maturity-link">Open collection planner ${icon('arrow-right')}</button></div>
+ </div></section>`;
+}
 function scheduleRows(list){return list.map(x=>`<tr><td><strong>${short(x.due_date)}</strong><span class="cell-sub">#${esc(x.installment_no)}</span></td><td><button class="table-text-link" data-loan-id="${esc(x.loan_id)}">${esc(x.loan_id)}</button><span class="cell-sub">${esc(x.borrower)}</span></td><td class="mono">${fmt(x.scheduled)}</td><td class="mono">${fmt(x.paid)}</td><td class="mono"><strong>${fmt(x.amount)}</strong></td><td>${badge(x.status)}${x.status==='Overdue'?`<span class="cell-sub">${x.days_past_due} day(s)</span>`:''}</td><td><button class="panel-link" data-modal="payment" data-pay-loan="${esc(x.loan_id)}">Post receipt ${icon('arrow-right')}</button></td></tr>`).join('');}
 function filteredSchedule(){return (UI.data.schedule_items||[]).filter(x=>{
  const days=daysBetween(UI.asof,x.due_date);
@@ -200,7 +213,7 @@ function dashboard(){
     <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('users')} Active borrowers</div><strong>${nfmt(activeBorrowers)}</strong><p>${nfmt(s.active_loans)} open loan agreements</p></div>
     <div class="v31-metric v31-metric-accent"><div class="v31-metric-eyebrow">${icon('calendar-days')} Due next 7 days</div><strong>${fmt(colInt.due_next_7_days||0)}</strong><p>Future installments · excludes today</p></div>
   </section>
-  ${capitalSnapshot()}
+  <div class="v35-dashboard-funding">${assetSourceMix()}${capitalSnapshot()}</div>
   <div class="v31-analytical-grid"><section class="panel v31-chart-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">PORTFOLIO ACTIVITY</span><h3>Collections & disbursements</h3><p>Monthly cash receipts compared with loans released.</p></div><div class="range-toggle" aria-label="Chart time range"><button data-range="6" class="${UI.chartRange===6?'active':''}" aria-pressed="${UI.chartRange===6}">6M</button><button data-range="12" class="${UI.chartRange===12?'active':''}" aria-pressed="${UI.chartRange===12}">12M</button></div></div><div class="v31-chart-stats"><span><i class="v31-chart-dot teal"></i> Collections <strong>${fmt(s.collections)}</strong></span><span><i class="v31-chart-dot pale"></i> Net loan releases <strong>${fmt(s.net_releases)}</strong></span></div><div class="chart-shell">${chartSVG(monthly)}</div></section>
   ${portfolioRisk()}</div>
   ${assetBridgeChart()}

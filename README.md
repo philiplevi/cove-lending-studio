@@ -1,3 +1,11 @@
+# Cove Lending Studio V3.4 — Owner-controlled Loan Cancellation
+
+**New:** Loans → open any non-voided loan → **Cancel loan**. Requires a verifiable cash outcome, zero unreversed receipts, and an audit reason. Imported loans require explicit historical-reconciliation acknowledgement. Cancellation writes a dated contra-release; no financial rows are hard-deleted.
+
+**Important:** Apply `supabase/migrations/202610240001_cancel_loans.sql` (after V3.3) and follow [UPGRADE_V3_4_CANCEL_LOAN.md](UPGRADE_V3_4_CANCEL_LOAN.md) before deploying. A full Next.js build and staging Supabase test are required before using the feature with live financial data.
+
+---
+
 # V3.1 Dashboard release note
 
 V3.1 adds an executive lending dashboard with capital/run-rate clarity, monthly receipts, PAR30/60/90 proxies, aging, collection coverage, and action queue. See `DESIGN_RESEARCH_V3_1.md` and `UPGRADE_V3_1.md` for definitions and deployment. No new Supabase migration is required.
@@ -130,3 +138,12 @@ Review all modules and capture requested corrections in one list using `V3_0_ONE
 ### V3.2 asset movement
 
 The executive dashboard now includes a read-only **Factors increasing assets** chart (the original spreadsheet visual). It uses live cash plus outstanding principal snapshots and displays monthly capital, interest collected, outflows, and any principal-allocation reconciliation effect separately. Opening balance + capital + interest − outflows + allocation adjustment = closing portfolio assets. This is a portfolio asset bridge, not a cashflow statement. See `UPGRADE_V3_2.md`.
+
+
+## V3.5 financial reporting
+
+**Dashboard**: The Asset Source Mix distinguishes net owner contributions (personal capital introduced less owner withdrawals), external borrowed funding net of debt-principal repayments, accumulated cash-basis interest less classified operating/financing expenses, and an explicit reconciliation balance. A negative component is shown as a signed amount rather than a misleading percentage. The original asset movement graph, contractual monthly interest and final due date are preserved.
+
+**Financial Statements**: Open the Financial Statements sidebar module (`/studio/statements`). Toggle Monthly, Quarterly, Yearly or Custom periods. Choose Income Statement, Cash Flow Statement or Statement of Financial Position; export CSV or use browser Print/Save as PDF. Reports are generated from two authenticated ledger snapshots, with statement-of-position amounts as of the selected period end.
+
+These are cash-basis **management** statements, not audited or PFRS-compliant statements. Accrued interest, expected losses, income taxes and other liabilities that were not posted are not recognized. Mixed/unclassified cash movements remain disclosed; do not treat them automatically as profit or owner withdrawals.

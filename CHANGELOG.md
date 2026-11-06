@@ -1,3 +1,13 @@
+# Changelog
+
+## 3.5.0 — Asset Source Mix and Financial Statements
+- Adds an owner-capital / retained-cash-earnings / borrowed-funding reconciliation to the dashboard.
+- Replaces the previous duplicated capital total block while retaining monthly contractual interest, scheduled final due date, and Factors Increasing Assets.
+- Negative net owner contributions are displayed explicitly, not forced into a positive percentage doughnut.
+- Adds a separate, authenticated Financial Statements module with monthly, quarterly, yearly and custom periods; income, cash flow and financial-position management views; CSV export and browser print-to-PDF.
+- Preserves existing lending posting logic and cashbook; no schema migration needed.
+- Adds comprehensive classification, reversal and navigation regression tests.
+
 ## V3.4 — Owner-controlled loan cancellation (October 24, 2026)
 - Added **Cancel loan** to each current loan drawer, including imported loans when separately acknowledged.
 - Does not hard-delete financial history. Requires real disbursement and refund verification, zero outstanding receipts, and a reason.

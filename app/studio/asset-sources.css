@@ -1,0 +1,38 @@
+/* V3.5: intentionally matches Cove's original white, deep-teal and emerald system. */
+.v35-dashboard-funding{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(340px,.95fr);gap:18px;align-items:stretch;margin:20px 0 24px}
+.v35-dashboard-funding>*{min-width:0;margin:0!important}
+.v35-source{border-radius:20px;padding:25px 28px;background:#fff;border:1px solid #dbe7e5;box-shadow:0 9px 30px rgba(11,48,58,.045)}
+.v35-source-head,.v35-contract-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:19px}
+.v35-source-head h2,.v35-contract-heading h2{color:#102f39;font-size:22px;letter-spacing:-.6px;line-height:1.16;margin:7px 0 4px}
+.v35-source-head p{color:#647e84;font-size:12px;line-height:1.5;max-width:430px;margin:0}
+.v35-inline-link{white-space:nowrap;border:1px solid #d9e8e6;background:#f5faf9;border-radius:10px;padding:9px 11px;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;color:#087369;text-decoration:none}
+.v35-inline-link svg{width:14px;height:14px}
+.v35-inline-link:hover{background:#e7f5f1}
+.v35-source-body{display:flex;align-items:center;gap:24px;min-width:0}
+.v35-mix-donut{width:172px;height:172px;flex:0 0 172px;border-radius:50%;display:grid;place-items:center;box-shadow:0 12px 25px rgba(5,54,60,.08)}
+.v35-mix-donut>div{border-radius:50%;background:#fff;width:125px;height:125px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:10px}
+.v35-mix-donut strong{color:#132f39;font-size:21px;letter-spacing:-.5px}.v35-mix-donut span{font-size:10px;color:#667f86}
+.v35-net-position{min-width:168px;max-width:184px;min-height:178px;border-radius:15px;flex:0 0 184px;padding:15px;background:linear-gradient(135deg,#e3f3ef,#f8fbfb);display:flex;flex-direction:column;justify-content:center;gap:9px;border:1px solid #c6e5df}
+.v35-net-position strong{color:#143741;letter-spacing:-.8px;font-size:25px;word-break:break-word}
+.v35-net-position small{font-size:11px;color:#55737a;line-height:1.5}
+.v35-net-pill{font-size:10px;font-weight:800;color:#086d64;display:flex;gap:5px;align-items:center}
+.v35-net-pill svg{width:14px;height:14px}
+.v35-source-breakdown{flex:1;min-width:0}
+.v35-source-line{display:grid;grid-template-columns:9px minmax(0,1fr) auto auto;column-gap:10px;align-items:start;padding:11px 0;border-bottom:1px solid #edf2f1}
+.v35-color{width:9px;height:9px;border-radius:4px;margin-top:4px}
+.v35-source-label{min-width:0}.v35-source-label b{display:block;font-size:12px;font-weight:800;color:#193843;line-height:1.35}.v35-source-label small{display:block;font-size:10px;color:#6a8186;line-height:1.45;margin-top:4px}
+.v35-source-line>strong{color:#123944;font-size:13px;font-weight:850;white-space:nowrap}.v35-source-line>strong.v35-negative{color:#bf6553}
+.v35-source-percent{font-size:10px;color:#087268;font-weight:800;border-radius:7px;background:#e9f7f1;padding:3px 5px;min-width:36px;text-align:center}
+.v35-source-foot{display:flex;gap:9px;align-items:flex-start;margin-top:18px;padding:11px 13px;border-radius:10px;background:#f2f7f6;color:#536f76;font-size:11px;line-height:1.6}
+.v35-source-foot>svg{width:16px;height:16px;flex:0 0 16px;margin-top:1px}
+.v35-contract-block{background:#fff;border-radius:20px;border:1px solid #dbe7e5;padding:25px 22px;box-shadow:0 9px 30px rgba(11,48,58,.045)}
+.v35-contract-block .v31-earnings-grid{display:flex;flex-direction:column;gap:12px}
+.v35-contract-block .v31-earnings-grid>*{min-height:0!important;width:100%!important}
+.v35-contract-block .v31-feature-value{font-size:33px}
+.v35-contract-block .v31-earnings-feature,.v35-contract-block .v31-maturity-feature{padding:16px 19px!important}
+.v35-contract-block .v31-maturity-value{font-size:25px}
+.v35-contract-block .v31-overline{font-size:10px}
+.v35-contract-block p{font-size:11px}
+@media(max-width:1200px){.v35-dashboard-funding{grid-template-columns:1fr}.v35-contract-block .v31-earnings-grid{display:grid;grid-template-columns:1fr 1fr}.v35-source-body{gap:20px}}
+@media(max-width:700px){.v35-source-head,.v35-contract-heading{flex-wrap:wrap}.v35-source{padding:19px}.v35-source-body{flex-direction:column;align-items:stretch}.v35-mix-donut,.v35-net-position{align-self:center}.v35-contract-block .v31-earnings-grid{display:flex;flex-direction:column}.v35-source-line{grid-template-columns:9px minmax(0,1fr) auto;gap:8px}.v35-source-percent{grid-column:3}.v35-source-head h2,.v35-contract-heading h2{font-size:19px}}
+.v35-historical{border-top:1px solid #e6efee;margin-top:12px;padding-top:11px;font-size:11px;color:#526f77}.v35-historical summary{cursor:pointer;font-weight:750}.v35-historical p{line-height:1.55}
