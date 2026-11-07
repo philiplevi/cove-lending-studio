@@ -12,7 +12,7 @@ export async function POST(request:NextRequest){
   const input=JSON.parse(raw) as {token?:unknown;values?:Record<string,unknown>};
   if(typeof input?.token!=='string'||!input.values||typeof input.values!=='object'||Array.isArray(input.values))return reply({error:'Invalid application request'},400);
   if(input.values.notice_version!==process.env.COVE_PRIVACY_NOTICE_VERSION)return reply({error:'Privacy notice version mismatch'},400);
-  const client=await createClient();const {data,error}=await client.rpc('cove_submit_loan_application',{token:input.token,v:input.values});
+  const client=await createClient();const {data,error}=await client.rpc('cove_v39_submit_loan_application',{token:input.token,v:input.values});
   if(error)return reply({error:'Application could not be accepted. Check the invitation and required information.'},422);
   return reply(data,201);
  }catch{return reply({error:'Unable to submit application'},500)}

@@ -1,0 +1,25 @@
+{
+  "version": "3.9.0",
+  "base": "V3.8",
+  "type": "non-financial applicant operations",
+  "requires_migration": "supabase/migrations/202611080001_cove_v39_application_reviews.sql",
+  "public_intake_default": "disabled",
+  "application_approval_posts_loan": false,
+  "evidence_uploads": false,
+  "files": {
+    "app/api/applications/route.ts": "bd305ac8427b7fe2fdc92c066f445956080d9aa288b649f20abf7a0dac885cd8",
+    "app/api/apply/route.ts": "2d925482b62eef8fbc42ecce1bbd88f89b7c46d9a42d94861284838507fe6b54",
+    "app/api/apply/track/route.ts": "c2beefddb1704e9378afd430edce2a7cfadfaf0fa5aeac67cf508b5c32f0380a",
+    "app/apply/page.tsx": "831c0541235f8d243d27f31785076e6f312b472450ae4e8d23f791e5b9943a9e",
+    "app/apply/apply.css": "2db3147981d96d6219de79bb539673df76a63c448063865c9145dc1ffcd81832",
+    "app/track/page.tsx": "e44c54af90262a38a3ca3e193849c904d34b443c10f549dc46f755c2bdae8a42",
+    "app/studio/applications/page.tsx": "27fe2ef0cff64f11b1660c2698b9f20eba3d841a41ccb5211cc62a588414a64e",
+    "app/studio/applications/applications.css": "e5e6f26ebf4172afb7606daeb8fe1be6c6d3505eaae07b8de78455f4ca5e7774",
+    "supabase/migrations/202611080001_cove_v39_application_reviews.sql": "dda32a162490a699b68a8db75c202d5204e60032328b311441abe2d3a591d506",
+    "tests/v39-application-workflow.test.mjs": "5f3fa7b01a899be044c6ec0d95265b326a2ee43b9280e612b41329fa5ea8df5f",
+    "package.json": "ce9c86bb923686f65e5ed421aaf3d1f58881f09b18a63637134a749a49ea9005",
+    "README.md": "cb7e04b64d807d0058cd777b0f46468c9d9984f74f165cd0c94e94c874f1a0c8",
+    "CHANGELOG.md": "1c9ec57e0618254961702c1e0b3f4b337524692356b9e7967b8f50672262dd50",
+    "UPGRADE_V3_9.md": "b46c1f7df1cbefc699fccd0961df1131aab06545ac1aa4b06b0fe48b1ab568fd"
+  }
+}

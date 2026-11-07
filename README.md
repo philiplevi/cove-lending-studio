@@ -155,3 +155,7 @@ The Data Integrity Center uses posted transaction checks at the selected as-of d
 
 ### V3.8 funding & borrower applications
 See `UPGRADE_V3_8.md` for audited cashbook classification corrections, externally documented noncash debt settlement, and the intentionally disabled-by-default borrower application pilot. **Do not open public lending intake without Philippine lending/OLP authorization, appropriate borrower disclosures, privacy/security approval, and full staging tests.**
+
+### V3.9: Borrower application operations
+
+The invitation-only borrower intake pilot has a status tracking page (`/track`) requiring the application reference **and** a one-time private code; `/studio/applications` has owner verification checks and auditable decisions. Approval requires four verified checks in the database and **does not** create or release a loan. Read [UPGRADE_V3_9.md](UPGRADE_V3_9.md) before migrating. Intake is disabled by default and must not be activated without lending and privacy compliance review.

@@ -115,3 +115,10 @@ Full dependency installation, Next.js type-check/build and vulnerability audit *
 - Restricted borrower application records to workspace owners; one-time token links are SHA-256 hashed at rest.
 - No automatic loan creation, credit decision, money release, messaging or KYC document upload.
 - New additive migration `202611070001_cove_v38_funding_applications.sql` needs staging verification.
+
+## 3.9.0 — Applicant review and tracking (2026-11-07)
+- Applicant reference and separate high-entropy status code with limited public status endpoint; tracking secrets stored hashed.
+- Four owner-only verification checks, status review history, and approval guard enforced at the database layer.
+- Private tracking code reissue for legacy and lost-code applicants; earlier code invalidated.
+- No borrower documents uploaded, no automatic loan creation, and public intake remains disabled by default.
+- One additive Supabase migration: `202611080001_cove_v39_application_reviews.sql`.

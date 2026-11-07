@@ -4,7 +4,7 @@ import './apply.css';
 
 const PILOT_MESSAGE='Applications are currently invitation-only. A submission is not a loan offer, approval, or disbursement.';
 export default function Apply(){
- const [busy,setBusy]=useState(false),[message,setMessage]=useState(''),[reference,setReference]=useState('');
+ const [busy,setBusy]=useState(false),[message,setMessage]=useState(''),[reference,setReference]=useState(''),[trackingCode,setTrackingCode]=useState('');
  const [token,setToken]=useState('');
  const [enabled,setEnabled]=useState(false),[noticeVersion,setNoticeVersion]=useState('UNAPPROVED'),[noticeUrl,setNoticeUrl]=useState('');
  // The owner must activate intake after verifying the applicable lending and privacy requirements.
@@ -19,12 +19,12 @@ export default function Apply(){
   try{
    const response=await fetch('/api/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,values})});
    const result=await response.json();if(!response.ok)throw Error(result.error||'Unable to submit application');
-   setReference(result.reference);form.reset();window.history.replaceState(null,'','/apply');
+   setReference(result.reference);setTrackingCode(result.tracking_code||'');form.reset();window.history.replaceState(null,'','/apply');
   }catch(err){setMessage(err instanceof Error?err.message:'Unable to submit application');}
   finally{setBusy(false);}
  }
  return <main className="apply-shell"><div className="apply-brand">Cove<span>.</span> <small>LOAN APPLICATIONS</small></div><section className="apply-card"><p className="apply-eyebrow">PRIVATE INVITATION · INITIAL REQUEST</p><h1>Apply for a loan</h1><p>{PILOT_MESSAGE}</p>
- {!enabled?<div className="apply-closed"><strong>Applications are not open yet.</strong><p>The lending and privacy setup must be approved before we collect applicant information online.</p></div>:reference?<div role="status" className="apply-success"><h2>Application received</h2><p>Your reference is <strong>{reference}</strong>.</p><p>Save this reference. Approval is subject to independent review and a separate agreement.</p></div>:<form onSubmit={submit}>
+ {!enabled?<div className="apply-closed"><strong>Applications are not open yet.</strong><p>The lending and privacy setup must be approved before we collect applicant information online.</p><p><a href="/track">Track an existing application</a></p></div>:reference?<div role="status" className="apply-success"><h2>Application received</h2><p>Your reference is <strong>{reference}</strong>.</p><p><strong>Private tracking code (shown only once):</strong></p><code className="apply-tracking-code">{trackingCode}</code><p>Save both the reference and the code securely. The code cannot be recovered later; contact the lender for a new one if lost.</p><p><a href="/track">Track application status</a>. Internal approval is not a loan disbursement or a final loan agreement.</p></div>:<form onSubmit={submit}>
  <label>Full legal name<input required minLength={3} maxLength={120} name="full_name" autoComplete="name"/></label>
  <div className="apply-grid"><label>Email address<input name="email" type="email" required maxLength={254} autoComplete="email"/></label><label>Mobile number<input name="phone" type="tel" required minLength={10} maxLength={20} autoComplete="tel"/></label></div>
  <label>City / province<input name="city_province" required minLength={3} maxLength={120} autoComplete="address-level2"/></label>
