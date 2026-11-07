@@ -4,7 +4,7 @@
  * These are CASH-BASIS management reports, not PFRS-compliant statutory accounts.
  */
 type Row=Record<string,any>;
-export type StatementSnapshot={as_of:string;summary:Row;capital:Row[];outflows:Row[];payments?:Row[];loans?:Row[]};
+export type StatementSnapshot={as_of:string;summary:Row;capital:Row[];outflows:Row[];funding_conversions?:Row[];payments?:Row[];loans?:Row[]};
 const amountCents=(row:Row)=>row.amount_cents!==undefined?Number(row.amount_cents):Math.round(Number(row.amount||0)*100);
 const toPeso=(cents:number)=>Math.round(cents)/100;
 const cents=(pesos:unknown)=>Math.round(Number(pesos||0)*100);
@@ -32,8 +32,9 @@ export function assetSourcePosition(s:StatementSnapshot){
  const ownerDraws=disburse('owner_draw'),borrowedRepayments=disburse('borrowed_repayment');
  const operatingExpenses=disburse('operating_expense'), financingCosts=disburse('financing_cost');
  const unclassifiedOutflows=disburse('unclassified');
- const netOwnerCapital=ownerContributions-ownerDraws;
- const remainingBorrowed=borrowedFunds-borrowedRepayments;
+ const convertedFunding=sum((s.funding_conversions||[]));
+ const netOwnerCapital=ownerContributions-ownerDraws+convertedFunding;
+ const remainingBorrowed=borrowedFunds-borrowedRepayments-convertedFunding;
  const earnedInterest=cents(s.summary.interest_collected);
  const retainedEarnings=earnedInterest-operatingExpenses-financingCosts;
  const portfolioAssets=cents(s.summary.portfolio_assets);
@@ -46,7 +47,7 @@ export function assetSourcePosition(s:StatementSnapshot){
  if(unknownFunding||unclassifiedOutflows)flags.push('Unclassified funding or outflows are included in the reconciliation balance until assigned to an appropriate category.');
  if(residual)flags.push('A reconciliation balance remains. It is not presumed to be lending profit or owner money.');
  const result={portfolio_assets:toPeso(portfolioAssets),gross_capital_infusion:toPeso(sum(capital)),owner_contributions:toPeso(ownerContributions),owner_draws:toPeso(ownerDraws),net_owner_capital:toPeso(netOwnerCapital),
-  external_funding:toPeso(borrowedFunds),external_repayments:toPeso(borrowedRepayments),external_liability:toPeso(remainingBorrowed),
+  external_funding:toPeso(borrowedFunds),external_repayments:toPeso(borrowedRepayments),external_conversions:toPeso(convertedFunding),external_liability:toPeso(remainingBorrowed),
   interest_received:toPeso(earnedInterest),operating_expenses:toPeso(operatingExpenses),financing_costs:toPeso(financingCosts),
   retained_cash_earnings:toPeso(retainedEarnings),unclassified_funding:toPeso(unknownFunding),unclassified_outflows:toPeso(unclassifiedOutflows),
   reconciliation_balance:toPeso(residual),flags,
@@ -61,6 +62,7 @@ export function buildFinancialStatements(open:StatementSnapshot,close:StatementS
  const interest=delta('interest_received'),opExpense=delta('operating_expenses'),finCost=delta('financing_costs');
  const netProfit=toPeso(cents(interest)-cents(opExpense)-cents(finCost));
  const ownerContributions=delta('owner_contributions'),externalFunding=delta('external_funding'),ownerDraws=delta('owner_draws'),externalRepayments=delta('external_repayments');
+ const noncashOwnerSettlements=delta('external_conversions');
  const unclassifiedFunding=delta('unclassified_funding'),unclassifiedOutflow=delta('unclassified_outflows');
  const borrowerReceipts=toPeso(cents(close.summary.collections)-cents(open.summary.collections));
  const releasedNet=toPeso(cents(close.summary.net_releases)-cents(open.summary.net_releases));
@@ -98,6 +100,7 @@ export function buildFinancialStatements(open:StatementSnapshot,close:StatementS
   {label:'Outstanding loan principal (net)',amount:Number(close.summary.principal_outstanding)},
   {label:'Total portfolio assets',amount:closing.portfolio_assets,kind:'total'},
   {label:'Outstanding external borrowed principal',amount:closing.external_liability},
+  {label:'Memo: debt personally settled by owner (noncash)',amount:noncashOwnerSettlements,kind:'detail'},
   {label:'Net contributed owner capital',amount:closing.net_owner_capital},
   {label:'Accumulated cash-basis lending surplus',amount:closing.retained_cash_earnings},
   {label:'Unclassified / reconciliation balance',amount:closing.reconciliation_balance},
@@ -106,6 +109,7 @@ export function buildFinancialStatements(open:StatementSnapshot,close:StatementS
  const warnings=[...closing.flags];
  if(cashDiff)warnings.push('Cash flow does not reconcile to ledger cash. Difference: '+cashDiff.toFixed(2));
  if(opExpense===0&&finCost===0)warnings.push('No classified period expenses were recorded; verify expenses before treating surplus as net profit.');
+ if(noncashOwnerSettlements)warnings.push('A documented owner-paid external debt settlement reclassified funding without changing Cove fund cash. Verify lender release evidence.');
  warnings.push('These are cash-basis management statements, not PFRS/IFRS financial statements. Contractual interest receivable, impairment provisions, accruals and income tax are not recognized.');
  return {period:{start:open.as_of,end:close.as_of},income,cash_flow:cashFlow,financial_position:position,
   metrics:{interest,operating_expenses:opExpense,financing_costs:finCost,net_cash_surplus:netProfit,owner_net:closing.net_owner_capital,

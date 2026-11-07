@@ -114,3 +114,5 @@
 .v37-bar-fill{display:block;min-width:2px;border-radius:3px;min-height:10px;background:#c07968}
 @container (max-width:800px){.v37-source-layout{grid-template-columns:1fr;gap:13px}.v37-composition{padding:8px 2px}.v37-diverging-legend{margin-top:16px}}
 @media(max-width:700px){.v37-source{padding:18px}.v37-formula-total strong{font-size:18px}.v37-composition-head strong{font-size:18px}.v37-composition-head{flex-wrap:wrap}}
+
+.v38-action-btn{border:1px solid #cbdedb;background:#f4faf8;color:#086d63;font-weight:700;font-size:12px;padding:8px 10px;border-radius:9px;cursor:pointer}.v38-action-btn:hover{background:#e1f4ed}

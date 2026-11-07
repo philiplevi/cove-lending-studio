@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     const params = body as Record<string,unknown>;
     if (params.action!=='signup' && params.action!=='signin') return respond({error:'Unknown authentication action.'},400);
     action=params.action;
+    if(action==='signup'&&process.env.COVE_ALLOW_NEW_WORKSPACE_SIGNUP==='false')return respond({error:'Workspace registration is closed. Use the borrower application page instead.'},403);
     email=String(params.email ?? '').trim().toLowerCase();
     password=String(params.password ?? '');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length>254 || password.length<8 || password.length>128) {

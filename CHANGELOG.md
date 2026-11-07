@@ -106,3 +106,12 @@ Full dependency installation, Next.js type-check/build and vulnerability audit *
 - Regenerates loan schedule and recomputes receipt splits where required, preserving receipt amounts, dates and references and archiving all old values.
 - Blocks incompatible corrections involving voided loans, approved extensions, mapped cash releases, or overpaid corrected contracts.
 - Added correction audit history, UI, tests, and a staging-first release guide. Existing SQL migrations and imported source baseline are preserved.
+
+## V3.8 — Funding corrections & invitation-only borrower applications
+- Added owner-only, audited classification corrections for posted capital/outflows; amount and date remain untouched.
+- Added documented, noncash owner-paid settlement of external borrowings, with no fund-cash or asset effect.
+- Updated cash-basis funding/financial-position calculations to account for owner-settled liabilities by effective date.
+- Added borrower application preview and owner review queue, disabled by default behind database/environment gates.
+- Restricted borrower application records to workspace owners; one-time token links are SHA-256 hashed at rest.
+- No automatic loan creation, credit decision, money release, messaging or KYC document upload.
+- New additive migration `202611070001_cove_v38_funding_applications.sql` needs staging verification.

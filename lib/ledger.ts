@@ -2,7 +2,7 @@ import {assetSourcePosition} from './financial-statements.ts';
 /* Pure presentation-side projection. Database RPC is the authoritative financial write engine.
  * Monetary inputs are centavos; never mutate the source arrays. */
 type Row = Record<string, any>;
-export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];loan_corrections?:Row[];cash_allocations?:Row[];baseline?:Row|null;};
+export type LedgerDataset = {borrowers:Row[];products:Row[];loans:Row[];installments:Row[];payments:Row[];capital:Row[];outflows:Row[];audit_log:Row[];loan_voids?:Row[];loan_extensions?:Row[];loan_corrections?:Row[];cash_allocations?:Row[];funding_conversions?:Row[];cashbook_corrections?:Row[];baseline?:Row|null;};
 const val=(r:Row,key:string)=>Number(r[key]||0);
 const pesos=(c:number)=>Math.round(c)/100;
 const rounded=(n:number)=>Math.round(n*100)/100;
@@ -24,6 +24,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const payments=(input.payments||[]).filter(p=>dateOnly(p.paid_on)<=asOf).sort((a,b)=>String(b.paid_on).localeCompare(String(a.paid_on))||String(b.id).localeCompare(String(a.id)));
   const capital=(input.capital||[]).filter(x=>dateOnly(x.occurred_on)<=asOf);
   const outflows=(input.outflows||[]).filter(x=>dateOnly(x.occurred_on)<=asOf);
+  const fundingConversions=(input.funding_conversions||[]).filter(x=>dateOnly(x.effective_on)<=asOf);
   const scheduleMap=new Map<string,Row[]>();
   for(const i of input.installments||[]) {
     if(!scheduleMap.has(i.loan_id))scheduleMap.set(i.loan_id,[]);
@@ -227,7 +228,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   const reconciliation=reconItems.filter(([,key])=>Object.hasOwn(original,key)).map(([name,key,system])=>({name,book:Number(original[key]),system,variance:rounded(system-Number(original[key]))}));
   const refs=new Map<string,string>();
   for(const p of payments){if(p.source_ref&&refs.has(p.source_ref))exceptions.push(`${p.id}: duplicate imported source receipt ${p.source_ref}`);if(p.source_ref)refs.set(p.source_ref,p.id);}
-  const asset_sources=assetSourcePosition({as_of:asOf,summary,capital,outflows});
+  const asset_sources=assetSourcePosition({as_of:asOf,summary,capital,outflows,funding_conversions:fundingConversions});
   // Always validate the POSTED LIVE TRANSACTIONS for the selected as-of date.
   // Original workbook totals are archival context only, never a live target.
   const receiptSplitIssues=payments.filter(p=>val(p,'amount_cents')!==val(p,'principal_cents')+val(p,'interest_cents'));
@@ -262,6 +263,7 @@ export function buildState(input:LedgerDataset,asOf:string) {
   return {as_of:asOf,summary,borrowers,products,loans:enriched,loan_voids:voids,loan_extensions:extensions,
     loan_corrections:input.loan_corrections||[], // expose restatement history even in earlier as-of views
     cash_allocations:(input.cash_allocations||[]).filter(a=>dateOnly(a.occurred_on)<=asOf),
+    funding_conversions:fundingConversions,cashbook_corrections:input.cashbook_corrections||[],
     payments:payments.map(p=>({...p,borrower_name:byId.get(loans.find(l=>l.id===p.loan_id)?.borrower_id)?.name||'Unknown',amount:pesos(val(p,'amount_cents')),principal:pesos(val(p,'principal_cents')),interest:pesos(val(p,'interest_cents'))})),
     capital:capital.map(c=>({...c,amount:pesos(val(c,'amount_cents'))})),outflows:outflows.map(o=>({...o,amount:pesos(val(o,'amount_cents'))})),
     monthly,asset_bridge:assetBridge,asset_sources,contractual_interest_loans:contractualInterestLoans,live_integrity:liveIntegrity,concentration,collection_intelligence:collectionIntelligence,schedule_items:scheduleItems,

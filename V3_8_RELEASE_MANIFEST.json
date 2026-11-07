@@ -1,0 +1,10 @@
+{
+  "version": "3.8.0",
+  "release_title": "Audited funding corrections and gated borrower application pilot",
+  "migration": "supabase/migrations/202611070001_cove_v38_funding_applications.sql",
+  "public_intake_default": "disabled",
+  "features": ["audited accounting classification", "noncash owner-paid external debt settlement", "invitation-based application capture", "owner review queue"],
+  "boundaries": ["no public loan applications without compliance approval", "no full in-place financial amount/date editing", "no actual debt disappearance without creditor release", "no automatic approval or disbursement"],
+  "mandatory_predeploy_checks": ["staging SQL/RLS tests", "npm run check", "npm audit --omit=dev", "git diff --cached --check"],
+  "readme": "UPGRADE_V3_8.md"
+}

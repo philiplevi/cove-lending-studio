@@ -152,3 +152,6 @@ These are cash-basis **management** statements, not audited or PFRS-compliant st
 
 ### V3.6 release notes
 The Data Integrity Center uses posted transaction checks at the selected as-of date rather than current-vs-original-import differences. It does not substitute for bank statement reconciliation. The dashboard's monthly contractual interest section has an expandable loan-level breakdown; Financial Statements remain in the independent sidebar module. See `UPGRADE_V3_6.md`.
+
+### V3.8 funding & borrower applications
+See `UPGRADE_V3_8.md` for audited cashbook classification corrections, externally documented noncash debt settlement, and the intentionally disabled-by-default borrower application pilot. **Do not open public lending intake without Philippine lending/OLP authorization, appropriate borrower disclosures, privacy/security approval, and full staging tests.**
