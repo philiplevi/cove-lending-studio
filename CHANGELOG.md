@@ -1,3 +1,11 @@
+## V3.10 — Dashboard cleanup and navigation polish
+
+- Removed duplicate top-level actions so **Record collection** and **New loan** are not repeated across the shell.
+- Simplified the dashboard header by removing the extra descriptive note and the low-value disclosure footer.
+- Polished the Cove brand mark and favicon for a more complete product feel, while keeping the same visual identity.
+- Made the left sidebar scrollable so lower modules remain reachable without browser zoom changes.
+- Refined top-right controls into cleaner notification/help utilities for a more production-ready look.
+
 ## V3.7 — Owner capital sources and optional verified legacy allocation repair
 
 - Compact gross capital -> borrowed capital -> owner withdrawals -> net owner capital breakdown.

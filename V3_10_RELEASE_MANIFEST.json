@@ -1,0 +1,16 @@
+{
+  "version": "3.10.0",
+  "release": "V3.10 Dashboard Cleanup & Navigation Polish",
+  "type": "ui-patch",
+  "requires_migration": false,
+  "files": [
+    "package.json",
+    "CHANGELOG.md",
+    "UPGRADE_V3_10.md",
+    "V3_10_RELEASE_MANIFEST.json",
+    "app/studio/page.tsx",
+    "app/studio/premium.css",
+    "public/studio-app.js",
+    "public/favicon.svg"
+  ]
+}

@@ -8,7 +8,7 @@ export default function Studio() {
   return <>
     <div className="shell">
       <aside className="sidebar" id="sidebar">
-        <a className="brand" href="#dashboard" aria-label="Cove Lending dashboard">
+        <a className="brand" href="#dashboard" aria-label="Cove Lending Studio">
           <span className="brand-mark"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M7 31L18.5 12L26.5 25L34 13L39 31" fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
           <span><strong>Cove<span className="brand-dot">.</span></strong><small>LENDING STUDIO</small></span>
         </a>
@@ -31,7 +31,6 @@ export default function Studio() {
           <button type="button" className="nav-item" data-page="controls"><span data-icon="shield-check"/> Reconciliation <span id="nav-warning" className="nav-dot"/></button>
         </nav>
         <div className="sidebar-bottom">
-          <button type="button" className="sidebar-create" data-modal="loan"><span data-icon="plus"/> New loan <span data-icon="arrow-right"/></button>
           <div className="status-block"><span className="status-pulse"/><div><strong>Secure workspace</strong><small>Supabase · Authenticated</small></div></div>
           <div className="operator"><span className="avatar">CO</span><span><strong>Portfolio owner</strong><small>Workspace administrator</small></span></div>
           <a className="cloud-link" href="/import">Import historical records</a>
@@ -42,7 +41,7 @@ export default function Studio() {
       <div className="workspace">
         <header className="topbar">
           <div className="topbar-left"><button type="button" className="mobile-menu" id="mobile-menu" aria-label="Toggle menu" aria-expanded="false"><span data-icon="menu"/></button><span className="breadcrumb">COVE / <strong id="breadcrumb">Dashboard</strong></span></div>
-          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="top-quick-pay" data-modal="payment"><span data-icon="plus"/> Record collection</button><button type="button" className="icon-btn" id="quick-refresh" title="Refresh data" aria-label="Refresh portfolio"><span data-icon="refresh-cw"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
+          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="icon-btn" title="Notifications" aria-label="Notifications"><span data-icon="bell"/></button><button type="button" className="icon-btn" title="Help" aria-label="Help"><span data-icon="circle-help"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
         </header>
         <main className="main" id="main"><div className="loading"><div className="spinner"/><h2>Preparing your portfolio</h2><p>Loading your lending workspace...</p></div></main>
       </div>

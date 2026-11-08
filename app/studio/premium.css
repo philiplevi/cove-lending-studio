@@ -116,3 +116,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 #form-cancel-loan .form-footer button[disabled]{opacity:.45;cursor:not-allowed}
 #form-cancel-loan .void-confirm-check{margin:13px 0;display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.5}
 #form-cancel-loan .void-confirm-check input{margin-top:3px;flex:none}
+
+/* V3.10 dashboard polish: cleaner shell, simpler dashboard actions, and scrollable navigation. */
+.sidebar{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2c6159 transparent}
+.sidebar::-webkit-scrollbar{width:10px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:#2c6159;border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+.brand-mark{position:relative;isolation:isolate}
+.brand-mark:after{content:'';position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border-radius:999px;background:#d6bb78;box-shadow:0 0 0 3px #10363a}
+.sidebar-bottom{margin-top:18px;padding-top:16px;border-top:1px solid #ffffff12;gap:2px}
+.topbar-right{gap:10px}
+.icon-btn{background:#fff;border:1px solid #dbe5df;box-shadow:0 1px 3px rgba(15,41,32,.05)}
+.icon-btn:hover{background:#f6fbf8;border-color:#cfe0d7}
+.page-head p:empty{display:none}
+@media(max-width:900px){.sidebar{padding-bottom:28px}}
