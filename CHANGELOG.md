@@ -1,3 +1,21 @@
+## V3.10.2 — Compact Asset Mix and Monthly Interest Performance
+
+- Maintains the existing doughnut Asset Source Mix and its auditable owner-capital computation, using net owner capital, retained cash-basis lending earnings and outstanding borrowed funding—not gross historical capital infusion as a false current-asset share.
+- Rebuilds the adjacent Scheduled Interest & Maturity card in the approved compact format: monthly contractual interest on the left and a seven-month interest bar chart on the right.
+- Adds interactive **Received / Scheduled** views. Received is actual net posted interest receipts by month, including reversals. Scheduled is an evenly allocated contract-interest-by-installment due-month comparison, not recognized income or an accrual.
+- Keeps final contractual due date, collection planner shortcut, and expandable loan-level interest breakdown below the chart.
+- Both charts react to the as-of date; historical reconciliation differences remain in Data Integrity, and negative owner capital still uses signed bars instead of an invalid doughnut.
+- UI only. No database schema, loan terms, receipt allocation or capital ledger changes.
+
+## V3.10.1 — Asset Source Mix Doughnut (November 2026)
+
+- Replaced the flat signed funding bars on the dashboard with a premium doughnut and amount/percentage legend **when all funding categories are nonnegative**.
+- Uses net owner capital, retained earnings, and outstanding borrowed capital as live source components; gross capital infusion is shown in the calculation strip, not misrepresented as today's asset balance.
+- Preserved the capital infusion, original borrowed-funding, withdrawals, and net-owner-capital calculation underneath the chart.
+- Displays classified funding subtotal separately from total portfolio assets when reconciliation items remain. Legacy differences continue to belong in Data Integrity.
+- Falls back to signed funding bars when a category is negative, instead of an invalid positive-share doughnut. Supports zero funding and mobile sizes.
+- No SQL migration, accounting write, or new dependency.
+
 ## V3.10 — Dashboard cleanup and navigation polish
 
 - Removed duplicate top-level actions so **Record collection** and **New loan** are not repeated across the shell.

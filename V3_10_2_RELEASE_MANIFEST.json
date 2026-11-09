@@ -1,0 +1,19 @@
+{
+  "product": "Cove Lending Studio",
+  "version": "3.10.2",
+  "base_version": "3.10.1",
+  "release": "Asset Mix & Monthly Interest Performance",
+  "requires_database_migration": false,
+  "changed_files": [
+    "package.json",
+    "CHANGELOG.md",
+    "app/studio/asset-sources.css",
+    "public/studio-app.js"
+  ],
+  "new_files": [
+    "tests/v3102-dashboard-interest-chart.test.mjs",
+    "UPGRADE_V3_10_2.md",
+    "V3_10_2_RELEASE_MANIFEST.json"
+  ],
+  "deployment": "Run npm run check and npm audit --omit=dev locally before git push"
+}

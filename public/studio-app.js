@@ -48,7 +48,7 @@ const daysBetween=(from,to)=>Math.round((Date.parse(to+'T12:00:00Z')-Date.parse(
 const initials=s=>String(s||'').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
 const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const initialPage=typeof location==='undefined'?'':location.hash.slice(1);
-const UI={page:['dashboard','loans','borrowers','collections','transactions','schedule','reports','controls'].includes(initialPage)?initialPage:'dashboard',data:null,asof:today(),filter:'All',query:'',cashFilter:'All',collectionFilter:'All',scheduleFilter:'Next 7 days',scheduleSearch:'',chartRange:12,assetRange:'all',loanId:null};
+const UI={page:['dashboard','loans','borrowers','collections','transactions','schedule','reports','controls'].includes(initialPage)?initialPage:'dashboard',data:null,asof:today(),filter:'All',query:'',cashFilter:'All',collectionFilter:'All',scheduleFilter:'Next 7 days',scheduleSearch:'',chartRange:12,assetRange:'all',interestChartMode:'received',loanId:null};
 const main=document.getElementById('main');
 const modRoot=document.getElementById('modal-root');
 const drawRoot=document.getElementById('drawer-root');
@@ -138,53 +138,117 @@ function assetSourceMix(){
  if(!m)return '';
  const gross=Number(m.gross_capital_infusion||0),borrowed=Number(m.external_funding||0),draws=Number(m.owner_draws||0),unknown=Number(m.unclassified_funding||0),converted=Number(m.external_conversions||0);
  const netOwner=Number(m.net_owner_capital||0),earnings=Number(m.retained_cash_earnings||0),debt=Number(m.external_liability||0);
+ const actualAssets=Number(m.portfolio_assets||0);
  const rows=[
-  {label:'Retained lending earnings',amount:earnings,color:'#12a995',kind:'earned'},
-  {label:'Outstanding borrowed capital',amount:debt,color:'#7f9fb5',kind:'borrowed'},
-  {label:'Net owner capital',amount:netOwner,color:'#086e64',kind:'owner'}
+  {label:'Net owner capital',amount:netOwner,color:'#057c6b'},
+  {label:'Retained lending earnings',amount:earnings,color:'#54c6a5'},
+  {label:'Outstanding borrowed capital',amount:debt,color:'#83a6bf'}
  ];
- const scale=Math.max(1,...rows.map(r=>Math.abs(r.amount)));
- const bars=rows.map(r=>{
-   const percent=Math.min(100,Math.abs(r.amount)/scale*100);
-   return `<div class="v37-source-chart-row">
-    <div class="v37-source-chart-label"><span class="v37-source-dot" style="background:${r.color}"></span><b>${r.label}</b><strong class="${r.amount<0?'v37-negative':''}">${fmt(r.amount)}</strong></div>
-    <div class="v37-diverging-bar" role="img" aria-label="${esc(r.label)} ${r.amount<0?'negative ':''}${fmt(r.amount)}">
-     <div class="v37-bar-negative">${r.amount<0?`<span style="width:${percent}%" class="v37-bar-fill" title="${esc(r.label)} ${fmt(r.amount)}"></span>`:''}</div>
-     <div class="v37-bar-positive">${r.amount>0?`<span style="width:${percent}% ;background:${r.color}" class="v37-bar-fill" title="${esc(r.label)} ${fmt(r.amount)}"></span>`:''}</div>
-    </div>
+ // Never draw a negative funding component as a positive doughnut slice.
+ const hasNegative=rows.some(row=>row.amount<0);
+ const positiveTotal=rows.reduce((sum,row)=>sum+Math.max(0,row.amount),0);
+ const classifiedTotal=rows.reduce((sum,row)=>sum+row.amount,0);
+ const pct=(amount)=>positiveTotal>0?amount/positiveTotal*100:0;
+ const chart=hasNegative?(()=>{
+  const scale=Math.max(1,...rows.map(row=>Math.abs(row.amount)));
+  return `<div class="v310-signed-position"><div class="v310-signed-heading">Signed funding position <span>Negative capital shown separately</span></div>${rows.map(row=>{
+   const percent=Math.min(100,Math.abs(row.amount)/scale*100);
+   return `<div class="v37-source-chart-row"><div class="v37-source-chart-label"><span class="v37-source-dot" style="background:${row.color}"></span><b>${row.label}</b><strong class="${row.amount<0?'v37-negative':''}">${fmt(row.amount)}</strong></div>
+    <div class="v37-diverging-bar" role="img" aria-label="${esc(row.label)} ${fmt(row.amount)}"><div class="v37-bar-negative">${row.amount<0?`<span class="v37-bar-fill" style="width:${percent}%"></span>`:''}</div><div class="v37-bar-positive">${row.amount>0?`<span class="v37-bar-fill" style="width:${percent}%;background:${row.color}"></span>`:''}</div></div></div>`;
+  }).join('')}</div>`;
+ })():positiveTotal>0?(()=>{
+  let offset=0;
+  const stops=rows.filter(row=>row.amount>0).map(row=>{
+   const start=offset;offset+=pct(row.amount);
+   return `${row.color} ${start.toFixed(5)}% ${offset.toFixed(5)}%`;
+  });
+  const gradient=`conic-gradient(${stops.join(', ')})`;
+  return `<div class="v310-donut" role="img" aria-label="Asset funding composition: ${rows.map(row=>`${row.label} ${fmt(row.amount)} ${pct(row.amount).toFixed(1)} percent`).join('; ')}" style="background:${gradient}">
+    <div class="v310-donut-core"><strong>${fmt(classifiedTotal)}</strong><small>Identified funding</small></div>
    </div>`;
- }).join('');
- const extra=unknown?`<div class="v37-formula-row"><span>Less unclassified funding</span><strong>−${fmt(unknown)}</strong></div>`:'';
- const balanceFoot=netOwner<0?`<p class="v37-owner-negative-note">Owner withdrawals exceed personal contributions by ${fmt(-netOwner)}.</p>`:'';
- return `<section class="v35-source v37-source panel" aria-label="Asset source mix and owner capital calculation">
-  <div class="v35-source-head"><div><span class="v31-eyebrow">ASSET OWNERSHIP & SOURCES</span><h2>Asset source mix</h2><p>Where your portfolio funding comes from.</p></div></div>
-  <div class="v37-source-layout">
-   <div class="v37-calculation">
-    <div class="v37-mini-title">NET OWNER CAPITAL</div>
-    <div class="v37-formula-row"><span>Capital infusion <small>(including borrowed)</small></span><strong>${fmt(gross)}</strong></div>
-    <div class="v37-formula-row"><span>Less borrowed capital <small>(original amount)</small></span><strong>−${fmt(borrowed)}</strong></div>
-    ${extra}
-    ${converted?`<div class="v37-formula-row"><span>Plus: debt personally settled</span><strong>+${fmt(converted)}</strong></div>`:''}
-    <div class="v37-formula-row"><span>Less owner withdrawals</span><strong>−${fmt(draws)}</strong></div>
-    <div class="v37-formula-total"><span>Net owner capital</span><strong class="${netOwner<0?'v37-negative':''}">${fmt(netOwner)}</strong></div>
-    ${balanceFoot}
-   </div>
-   <div class="v37-composition">
-    <div class="v37-composition-head"><div><div class="v37-mini-title">CURRENT ASSET FUNDING</div><span>Cash + outstanding principal</span></div><strong>${fmt(m.portfolio_assets)}</strong></div>
-    <div class="v37-diverging-legend"><span>Withdrawn beyond capital <i></i> 0 <i></i> Funds supporting assets</span></div>
-    <div class="v37-source-chart">${bars}</div>
-   </div>
+ })():`<div class="v310-donut v310-donut-empty" role="img" aria-label="No positive classified funding"><div class="v310-donut-core"><strong>${fmt(0)}</strong><small>No funding yet</small></div></div>`;
+ const legend=hasNegative?'':`<div class="v310-mix-legend">${rows.map(row=>`<div class="v310-mix-row"><span class="v310-mix-dot" style="background:${row.color}"></span><span class="v310-mix-label">${row.label}</span><strong class="${row.amount<0?'v37-negative':''}">${fmt(row.amount)}</strong><span class="v310-mix-percent">${positiveTotal>0?pct(Math.max(0,row.amount)).toFixed(1)+'%':'—'}</span></div>`).join('')}</div>`;
+ const adjustment=unknown?`<div><span>Funding classification adjustment</span><strong>−${fmt(unknown)}</strong></div>`:'';
+ return `<section class="v35-source v310-asset-mix panel" aria-label="Asset source mix">
+  <div class="v35-source-head"><div><span class="v31-eyebrow">ASSET OWNERSHIP & SOURCES</span><h2>Asset source mix</h2></div><div class="v310-total-assets"><span>Total portfolio assets</span><strong>${fmt(actualAssets)}</strong></div></div>
+  <div class="v310-mix-main ${hasNegative?'v310-mix-main-signed':''}">${chart}${legend}</div>
+  <div class="v310-capital-strip" aria-label="Net owner capital calculation">
+   <div><span>Capital infusion <small>(incl. borrowed)</small></span><strong>${fmt(gross)}</strong></div>
+   <div><span>Less borrowed capital</span><strong>−${fmt(borrowed)}</strong></div>
+   ${adjustment}
+   ${converted?`<div><span>Debt converted to owner capital</span><strong>+${fmt(converted)}</strong></div>`:''}
+   <div><span>Less owner withdrawals</span><strong>−${fmt(draws)}</strong></div>
+   <div class="v310-capital-net"><span>Net owner capital</span><strong class="${netOwner<0?'v37-negative':''}">${fmt(netOwner)}</strong></div>
   </div>
  </section>`;
 }
+
+// V3.10.2 compact seven-month chart. Cash receipts and contractual
+// scheduled interest are different concepts and are never mixed.
+function monthlyInterestSeries(asOf,assetBridge,loans,mode='received'){
+ const yyyy=Number(String(asOf).slice(0,4)),mm=Number(String(asOf).slice(5,7));
+ const keys=Array.from({length:7},(_,i)=>{
+  const date=new Date(Date.UTC(yyyy,mm-1-(6-i),1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,'0')}`;
+ });
+ const totals=new Map(keys.map(month=>[month,0]));
+ if(mode==='scheduled'){
+  for(const loan of loans||[]){
+   const schedule=Array.isArray(loan.schedule)?loan.schedule:[];
+   if(!schedule.length)continue;
+   const totalCents=Math.round(Number(loan.interest||0)*100);
+   const base=Math.trunc(totalCents/schedule.length);
+   schedule.forEach((inst,i)=>{
+    const due=String(inst.due_date||'').slice(0,10),key=due.slice(0,7);
+    if(!totals.has(key)||due>asOf||(loan.voided_on&&due>=String(loan.voided_on).slice(0,10)))return;
+    const cents=i===schedule.length-1?totalCents-base*(schedule.length-1):base;
+    totals.set(key,totals.get(key)+cents);
+   });
+  }
+  return keys.map(month=>({month,value:Math.round(totals.get(month))/100}));
+ }
+ for(const row of assetBridge||[]){
+  if(totals.has(row.month))totals.set(row.month,totals.get(row.month)+Math.round(Number(row.interest_collected||0)*100));
+ }
+ return keys.map(month=>({month,value:Math.round(totals.get(month))/100}));
+}
+function monthlyInterestChart(){
+ const mode=UI.interestChartMode==='scheduled'?'scheduled':'received';
+ const rows=monthlyInterestSeries(UI.asof,UI.data.asset_bridge||[],UI.data.loans||[],mode);
+ const max=Math.max(0,...rows.map(x=>x.value));
+ const min=Math.min(0,...rows.map(x=>x.value));
+ const nice=(n)=>n<=0?0:n<=100?Math.ceil(n/25)*25:n<=1000?Math.ceil(n/250)*250:n<=10000?Math.ceil(n/2500)*2500:Math.ceil(n/5000)*5000;
+ const topValue=nice(max)||((min===0)?1:0),bottomValue=nice(Math.abs(min));
+ const range=Math.max(1,topValue+bottomValue);
+ const w=440,h=228,left=43,top=17,right=9,bottom=37,inner=w-left-right,plot=h-top-bottom;
+ const zeroY=top+plot*(topValue/range);
+ const label=v=>Math.abs(v)>=1000?`${Number((v/1000).toFixed(1))}k`:String(Math.round(v));
+ const guides=[0,.25,.5,.75,1].map(frac=>{
+  const value=-bottomValue+range*frac;
+  const y=top+plot*(1-frac);
+  return `<line x1="${left}" y1="${y}" x2="${w-right}" y2="${y}" class="v3102-chart-guide"/><text x="${left-8}" y="${y+3.5}" text-anchor="end" class="v3102-axis-label">${label(value)}</text>`;
+ }).join('');
+ const col=inner/rows.length,bw=Math.min(36,col*.62);
+ const bars=rows.map((r,i)=>{
+  const barHeight=Math.abs(r.value)/range*plot;
+  const x=left+i*col+(col-bw)/2, y=r.value>=0?zeroY-barHeight:zeroY;
+  const last=i===rows.length-1;
+  return `<g><rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${bw.toFixed(2)}" height="${barHeight.toFixed(2)}" rx="${Math.min(6,barHeight/2).toFixed(2)}" class="v3102-interest-bar ${r.value<0?'is-negative':last?'is-current':''}"><title>${esc(r.month)} · ${mode==='received'?'Interest received':'Scheduled contract interest'}: ${fmt(r.value)}</title></rect><text x="${(x+bw/2).toFixed(2)}" y="${h-9}" text-anchor="middle" class="v3102-month-label">${monthLabel(r.month)}</text></g>`;
+ }).join('');
+ const seriesTotal=rows.reduce((n,r)=>n+r.value,0);
+ return `<div class="v3102-interest-chart-wrap">
+   <div class="v3102-chart-head"><span>${mode==='received'?'Interest received by month':'Contract interest by due month'}</span><div class="v3102-chart-toggle" role="group" aria-label="Monthly interest chart view"><button type="button" data-interest-view="received" aria-pressed="${mode==='received'}" class="${mode==='received'?'active':''}">Received</button><button type="button" data-interest-view="scheduled" aria-pressed="${mode==='scheduled'}" class="${mode==='scheduled'?'active':''}">Scheduled</button></div></div>
+   <svg class="v3102-interest-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Seven-month ${mode==='received'?'interest collected':'contract interest scheduled'} chart, ${fmt(seriesTotal)} total">${guides}${bars}</svg>
+   <span class="v3102-chart-foot">${mode==='received'?'Cash-basis interest receipts':'Contractual amounts scheduled through the selected date'}</span>
+  </div>`;
+}
 function capitalSnapshot(){
  const s=UI.data.summary;
- return `<section class="v35-contract-block" aria-label="Contract interest and final scheduled collection">
- <div class="v35-contract-heading"><div><span class="v31-eyebrow">EARNINGS & MATURITY</span><h2>Scheduled interest & maturity</h2></div></div>
- <div class="v31-earnings-grid">
-  <div class="v31-earnings-feature"><div class="v31-feature-decor" aria-hidden="true"></div><div class="v31-overline">${icon('circle-dollar-sign')} MONTHLY CONTRACTUAL INTEREST</div><div class="v31-feature-value">${fmt(s.monthly_interest_run_rate)}</div><p>Contractual run-rate, not collected income.</p><div class="v31-feature-foot"><span class="v31-mini-dot"></span> ${s.active_loans} active agreements · ${short(UI.asof)}</div></div>
-  <div class="v31-maturity-feature"><div class="v31-overline">${icon('calendar-days')} FINAL SCHEDULED DUE DATE</div><div class="v31-maturity-value">${s.scheduled_final_collection_date?short(s.scheduled_final_collection_date):'No open loans'}</div><p>${s.last_due_is_past?'The latest contractual maturity has passed. Collectibles still require follow-up.':'Latest contractual due date. Actual payment may occur earlier or later.'}</p><button data-page="schedule" class="v31-maturity-link">Open collection planner ${icon('arrow-right')}</button></div>
-  </div>
+ return `<section class="v35-contract-block v3102-interest-panel" aria-label="Monthly interest performance and contractual maturity">
+  <div class="v35-contract-heading"><div><span class="v31-eyebrow">EARNINGS & MATURITY</span><h2>Scheduled interest & maturity</h2></div></div>
+  <div class="v3102-interest-main"><div class="v31-earnings-feature v3102-contract-card"><div class="v31-feature-decor" aria-hidden="true"></div><div class="v31-overline">${icon('circle-dollar-sign')} MONTHLY CONTRACTUAL INTEREST</div><div class="v31-feature-value">${fmt(s.monthly_interest_run_rate)}</div><small>${s.active_loans} active agreements · as of ${short(UI.asof)}</small></div>
+  ${monthlyInterestChart()}</div>
+  <div class="v3102-maturity-row"><div>${icon('calendar-days')} <span>FINAL SCHEDULED DUE DATE</span><strong>${s.scheduled_final_collection_date?short(s.scheduled_final_collection_date):'No open loans'}</strong></div><button type="button" data-page="schedule">Collection planner ${icon('arrow-right')}</button></div>
   ${contractualInterestBreakdown()}
  </section>`;
 }
@@ -532,7 +596,7 @@ function downloadCSV(){
  const csv=[headings.map(safeCell).join(','),...list.map(x=>headings.map(y=>safeCell(x[y])).join(','))].join('\r\n');
  const url=URL.createObjectURL(new Blob(['\uFEFF',csv],{type:'text/csv;charset=utf8'}));let a=document.createElement('a');a.href=url;a.download=forReports?'cove-monthly-report.csv':forCollections?'cove-collection-register.csv':'cove-transaction-ledger.csv';a.click();URL.revokeObjectURL(url);
 }
-document.addEventListener('click',async e=>{let t=e.target.closest('[data-page],[data-modal],[data-loan-id],[data-close-modal],[data-close-drawer],[data-filter],[data-cash-filter],[data-collection-filter],[data-schedule-filter],[data-range],[data-asset-range],[data-reverse-id],[data-void-loan],[data-cancel-loan],[data-edit-loan],[data-cash-edit],[data-funding-settle],#download-csv,#download-asset-csv,#quick-refresh,#mobile-menu,#sidebar-scrim');if(!t)return;if(t.dataset.page){navigate(t.dataset.page);return}if(t.dataset.closeModal!==undefined){modRoot.innerHTML='';return}if(t.dataset.closeDrawer!==undefined){drawRoot.innerHTML='';return}if(t.dataset.modal){if(t.dataset.modal==='payment')drawRoot.innerHTML='';openModal(t.dataset.modal,t.dataset.payLoan);return}if(t.dataset.loanId){showLoan(t.dataset.loanId);return}if(t.dataset.filter){UI.filter=t.dataset.filter;render();return}if(t.dataset.cashFilter){UI.cashFilter=t.dataset.cashFilter;render();return}if(t.dataset.collectionFilter){UI.collectionFilter=t.dataset.collectionFilter;render();return}if(t.dataset.scheduleFilter){UI.scheduleFilter=t.dataset.scheduleFilter;render();return}if(t.dataset.range){UI.chartRange=Number(t.dataset.range)===6?6:12;render();return}if(t.dataset.assetRange){UI.assetRange=['6','12','all'].includes(t.dataset.assetRange)?t.dataset.assetRange:'all';render();return}if(t.id==='download-asset-csv'){exportAssetBridge();return}if(t.id==='download-csv'){downloadCSV();return}if(t.id==='quick-refresh'){await load(true);return}if(t.id==='sidebar-scrim'){document.querySelector('.sidebar').classList.remove('open');t.classList.remove('open');document.getElementById('mobile-menu')?.setAttribute('aria-expanded','false');return}if(t.id==='mobile-menu'){let expanded=document.querySelector('.sidebar').classList.toggle('open');document.getElementById('sidebar-scrim')?.classList.toggle('open',expanded);t.setAttribute('aria-expanded',String(expanded));return}if(t.dataset.cashEdit){editCashbookClassification(t.dataset.cashEdit,t.dataset.cashId);return}if(t.dataset.fundingSettle!==undefined){showOwnerSettlement();return}if(t.dataset.editLoan){showEditLoan(t.dataset.editLoan);return}if(t.dataset.cancelLoan){showCancelLoan(t.dataset.cancelLoan);return}if(t.dataset.voidLoan){showVoidLoan(t.dataset.voidLoan);return}if(t.dataset.reverseId){let reason=window.prompt(`Enter correction reason for ${t.dataset.reverseId}. The original receipt will remain in the audit history:`);if(reason===null)return;try{await post('/api/payments/'+t.dataset.reverseId+'/reverse',{reason});drawRoot.innerHTML='';await load();toast('Reversal posted to the ledger')}catch(err){toast(err.message,true)}return}});
+document.addEventListener('click',async e=>{let t=e.target.closest('[data-page],[data-modal],[data-loan-id],[data-close-modal],[data-close-drawer],[data-filter],[data-cash-filter],[data-collection-filter],[data-schedule-filter],[data-range],[data-asset-range],[data-interest-view],[data-reverse-id],[data-void-loan],[data-cancel-loan],[data-edit-loan],[data-cash-edit],[data-funding-settle],#download-csv,#download-asset-csv,#quick-refresh,#mobile-menu,#sidebar-scrim');if(!t)return;if(t.dataset.page){navigate(t.dataset.page);return}if(t.dataset.closeModal!==undefined){modRoot.innerHTML='';return}if(t.dataset.closeDrawer!==undefined){drawRoot.innerHTML='';return}if(t.dataset.modal){if(t.dataset.modal==='payment')drawRoot.innerHTML='';openModal(t.dataset.modal,t.dataset.payLoan);return}if(t.dataset.loanId){showLoan(t.dataset.loanId);return}if(t.dataset.filter){UI.filter=t.dataset.filter;render();return}if(t.dataset.cashFilter){UI.cashFilter=t.dataset.cashFilter;render();return}if(t.dataset.collectionFilter){UI.collectionFilter=t.dataset.collectionFilter;render();return}if(t.dataset.scheduleFilter){UI.scheduleFilter=t.dataset.scheduleFilter;render();return}if(t.dataset.range){UI.chartRange=Number(t.dataset.range)===6?6:12;render();return}if(t.dataset.assetRange){UI.assetRange=['6','12','all'].includes(t.dataset.assetRange)?t.dataset.assetRange:'all';render();return}if(t.dataset.interestView){UI.interestChartMode=t.dataset.interestView==='scheduled'?'scheduled':'received';render();return}if(t.id==='download-asset-csv'){exportAssetBridge();return}if(t.id==='download-csv'){downloadCSV();return}if(t.id==='quick-refresh'){await load(true);return}if(t.id==='sidebar-scrim'){document.querySelector('.sidebar').classList.remove('open');t.classList.remove('open');document.getElementById('mobile-menu')?.setAttribute('aria-expanded','false');return}if(t.id==='mobile-menu'){let expanded=document.querySelector('.sidebar').classList.toggle('open');document.getElementById('sidebar-scrim')?.classList.toggle('open',expanded);t.setAttribute('aria-expanded',String(expanded));return}if(t.dataset.cashEdit){editCashbookClassification(t.dataset.cashEdit,t.dataset.cashId);return}if(t.dataset.fundingSettle!==undefined){showOwnerSettlement();return}if(t.dataset.editLoan){showEditLoan(t.dataset.editLoan);return}if(t.dataset.cancelLoan){showCancelLoan(t.dataset.cancelLoan);return}if(t.dataset.voidLoan){showVoidLoan(t.dataset.voidLoan);return}if(t.dataset.reverseId){let reason=window.prompt(`Enter correction reason for ${t.dataset.reverseId}. The original receipt will remain in the audit history:`);if(reason===null)return;try{await post('/api/payments/'+t.dataset.reverseId+'/reverse',{reason});drawRoot.innerHTML='';await load();toast('Reversal posted to the ledger')}catch(err){toast(err.message,true)}return}});
 document.addEventListener('change',e=>{if(e.target.closest('#form-correct-loan')){UI.correctionDraft=null;UI.correctionPlan=null;const out=document.getElementById('correction-preview');if(out)out.innerHTML='';}let id=e.target.id;if(id==='date-asof'){UI.asof=e.target.value||today();load();return}if(['product_id','principal','term_months','frequency'].includes(id))updateLoanPreview();if(id==='loan_id'){updatePaymentPreview(true);return}if(id==='amount'&&e.target.closest('#form-payment'))updatePaymentPreview(false)});
 document.addEventListener('input',e=>{if(e.target.closest('#form-correct-loan')){UI.correctionDraft=null;UI.correctionPlan=null;const out=document.getElementById('correction-preview');if(out)out.innerHTML='';}if(['loan-search','borrower-search','collection-search','schedule-search'].includes(e.target.id)){let cursor=e.target.selectionStart;if(e.target.id==='schedule-search')UI.scheduleSearch=e.target.value;else UI.query=e.target.value;let tbody=e.target.closest('.toolbar');if(UI.page==='loans'){let filtered=filteredLoans();let current=document.getElementById('main');let focused=e.target;let pos=focused.selectionStart;render();let replacement=document.getElementById('loan-search');replacement.focus();replacement.setSelectionRange(pos,pos)}else{render();let replacement=document.getElementById(e.target.id);replacement?.focus();replacement?.setSelectionRange(cursor,cursor)}return}if(['principal','term_months'].includes(e.target.id)&&e.target.closest('#form-loan'))updateLoanPreview();if(e.target.id==='amount'&&e.target.closest('#form-payment'))updatePaymentPreview(false)});
 document.addEventListener('submit',submitForm);
