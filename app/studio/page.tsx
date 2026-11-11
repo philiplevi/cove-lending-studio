@@ -3,6 +3,7 @@ import './studio.css';
 import './premium.css';
 import './executive.css';
 import './asset-sources.css';
+import './nocturne.css';
 
 export default function Studio() {
   return <>
@@ -41,7 +42,7 @@ export default function Studio() {
       <div className="workspace">
         <header className="topbar">
           <div className="topbar-left"><button type="button" className="mobile-menu" id="mobile-menu" aria-label="Toggle menu" aria-expanded="false"><span data-icon="menu"/></button><span className="breadcrumb">COVE / <strong id="breadcrumb">Dashboard</strong></span></div>
-          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="icon-btn" title="Notifications" aria-label="Notifications"><span data-icon="bell"/></button><button type="button" className="icon-btn" title="Help" aria-label="Help"><span data-icon="circle-help"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
+          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="icon-btn" id="quick-refresh" title="Refresh portfolio" aria-label="Refresh portfolio"><span data-icon="refresh-cw"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
         </header>
         <main className="main" id="main"><div className="loading"><div className="spinner"/><h2>Preparing your portfolio</h2><p>Loading your lending workspace...</p></div></main>
       </div>

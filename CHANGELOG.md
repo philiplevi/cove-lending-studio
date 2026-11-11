@@ -1,3 +1,11 @@
+## V3.10.3 — Nocturne premium dashboard styling (2026-11-09)
+
+- Applies the approved dark teal, mint and lime visual direction to the principal Cove workspace with more compact and consistent dashboard spacing.
+- Re-styles the hero, lending KPIs, funding source donut/signed bars, contractual/received-interest chart, collections chart, risk monitor and tabular modules without altering financial figures.
+- Removes repeated explanatory notes in dashboard cards and redundant exact table titles (distinct table headings remain).
+- Restores the functional portfolio Refresh control and keeps sidebar vertical scrolling.
+- No database migration or posting changes. The full Next.js build and deployment still require the local quality gate.
+
 ## V3.10.2 — Compact Asset Mix and Monthly Interest Performance
 
 - Maintains the existing doughnut Asset Source Mix and its auditable owner-capital computation, using net owner capital, retained cash-basis lending earnings and outstanding borrowed funding—not gross historical capital infusion as a false current-asset share.

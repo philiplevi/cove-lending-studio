@@ -1,0 +1,28 @@
+{
+  "product": "Cove Lending Studio",
+  "version": "3.10.3",
+  "release": "Nocturne premium dashboard & table title cleanup",
+  "base": "V3.10.x (includes latest V3.10.2 dashboard components)",
+  "requires_database_migration": false,
+  "replaces": [
+    "app/studio/page.tsx",
+    "app/studio/asset-sources.css",
+    "public/studio-app.js",
+    "package.json",
+    "CHANGELOG.md"
+  ],
+  "adds": [
+    "app/studio/nocturne.css",
+    "tests/v3103-nocturne.test.mjs",
+    "UPGRADE_V3_10_3.md",
+    "V3_10_3_RELEASE_MANIFEST.json"
+  ],
+  "includes_from_v3102": [
+    "tests/v3102-dashboard-interest-chart.test.mjs"
+  ],
+  "notes": [
+    "No financial computation or database writes are modified.",
+    "No fabricated growth statistics or static placeholder dashboard values.",
+    "Main /studio workspace uses dark theme; standalone modules retain existing skins."
+  ]
+}

@@ -140,9 +140,9 @@ function assetSourceMix(){
  const netOwner=Number(m.net_owner_capital||0),earnings=Number(m.retained_cash_earnings||0),debt=Number(m.external_liability||0);
  const actualAssets=Number(m.portfolio_assets||0);
  const rows=[
-  {label:'Net owner capital',amount:netOwner,color:'#057c6b'},
-  {label:'Retained lending earnings',amount:earnings,color:'#54c6a5'},
-  {label:'Outstanding borrowed capital',amount:debt,color:'#83a6bf'}
+  {label:'Net owner capital',amount:netOwner,color:'#c8fa38'},
+  {label:'Retained lending earnings',amount:earnings,color:'#18cfa8'},
+  {label:'Outstanding borrowed capital',amount:debt,color:'#71bbc8'}
  ];
  // Never draw a negative funding component as a positive doughnut slice.
  const hasNegative=rows.some(row=>row.amount<0);
@@ -282,7 +282,7 @@ function portfolioRisk(){
  const ages=s.principal_aging||[];
  const total=s.principal_outstanding||0;
  return `<section class="v31-risk-panel panel" aria-label="Loan portfolio quality">
- <div class="v31-risk-heading"><div><span class="v31-eyebrow">RISK MONITOR</span><h3>Portfolio quality</h3><p>Spot repayment pressure before it grows.</p></div><button class="v31-text-button" data-page="schedule">Follow up ${icon('arrow-right')}</button></div>
+ <div class="v31-risk-heading"><div><span class="v31-eyebrow">RISK MONITOR</span><h3>Portfolio quality</h3></div><button class="v31-text-button" data-page="schedule">Follow up ${icon('arrow-right')}</button></div>
  <div class="v31-risk-top"><div><span class="v31-risk-label">PAR30 · principal at risk</span><strong class="v31-risk-value ${risk>0?'v31-risk-alert':''}">${value}</strong><small>${fmt(risk)} in loans over 30 days past due</small></div><div class="v31-risk-divide"></div><div><span class="v31-risk-label">Loans past due</span><strong class="v31-risk-value">${nfmt(s.overdue_loans)}</strong><small>${fmt(s.overdue_amount)} unpaid installments</small></div></div>
  <div class="v31-risk-bar" role="img" aria-label="Outstanding principal by days past due">${ages.map((b,i)=>`<span class="v31-aging-part v31-aging-${i}" style="width:${total?b.principal/total*100:0}%" title="${esc(b.label)}: ${fmt(b.principal)}"></span>`).join('')}</div>
  <div class="v31-aging-labels">${ages.map((b,i)=>`<div><span class="v31-aging-swatch v31-aging-${i}"></span><span>${esc(b.label)}</span><b>${fmt(b.principal)}</b></div>`).join('')}</div>
@@ -303,21 +303,21 @@ function dashboard(){
  const m=monthly.find(x=>x.month===UI.asof.slice(0,7))||{};
  const colInt=d.collection_intelligence||{};
  const empty=!d.loans.length;
- return `${pageHeader('YOUR PORTFOLIO','Lending overview','',`${dateControl()} <button class="btn outline" data-modal="payment">${icon('hand-coins')} Record collection</button> ${actionButton('New loan','loan')}`)}
+ return `${pageHeader('YOUR PORTFOLIO','Lending <span class="cove-lime">overview</span>','',`${dateControl()} <button class="btn outline" data-modal="payment">${icon('hand-coins')} Record collection</button> ${actionButton('New loan','loan')}`)}
  ${empty?`<div class="onboard-bar">${icon('info')} <div><strong>Set up your portfolio</strong><span>Import historical transactions or create your first loan.</span></div><a class="btn primary" href="/import">Import data ${icon('arrow-right')}</a></div>`:''}
  <div class="v31-dashboard-root">
-  <section class="v31-hero" aria-label="Portfolio summary"><div class="v31-hero-primary"><span class="v31-overline"><i class="v31-hero-dot"></i> TOTAL PORTFOLIO ASSETS · ${short(UI.asof).toUpperCase()}</span><div class="v31-hero-total">${fmt(s.portfolio_assets)}</div><p>What your lending business currently holds in cash and unpaid principal.</p><div class="v31-hero-bottom"><span>TRANSACTION-BACKED</span><span>AS-OF REPORTING</span></div></div><div class="v31-hero-secondary"><div><span>${icon('wallet')} Cash available</span><strong>${fmt(s.cash)}</strong><small>Fund cashbook balance</small></div><div><span>${icon('layers')} Principal outstanding</span><strong>${fmt(s.principal_outstanding)}</strong><small>Lent capital yet to recover</small></div></div></section>
+  <section class="v31-hero" aria-label="Portfolio summary"><div class="v31-hero-primary"><span class="v31-overline"><i class="v31-hero-dot"></i> TOTAL PORTFOLIO ASSETS · ${short(UI.asof).toUpperCase()}</span><div class="v31-hero-total">${fmt(s.portfolio_assets)}</div></div><div class="v31-hero-secondary"><div><span>${icon('wallet')} Cash available</span><strong>${fmt(s.cash)}</strong><small>Fund cashbook balance</small></div><div><span>${icon('layers')} Principal outstanding</span><strong>${fmt(s.principal_outstanding)}</strong><small>Lent capital yet to recover</small></div></div></section>
   <section class="v31-metric-grid" aria-label="Key lending indicators">
-    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('hand-coins')} Collections · this month</div><strong>${fmt(m.collections||0)}</strong><p>Actual cash receipts</p></div>
-    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('banknote')} Total receivables</div><strong>${fmt(s.gross_outstanding)}</strong><p>Unpaid principal + contractual interest</p></div>
-    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('users')} Active borrowers</div><strong>${nfmt(activeBorrowers)}</strong><p>${nfmt(s.active_loans)} open loan agreements</p></div>
-    <div class="v31-metric v31-metric-accent"><div class="v31-metric-eyebrow">${icon('calendar-days')} Due next 7 days</div><strong>${fmt(colInt.due_next_7_days||0)}</strong><p>Future installments · excludes today</p></div>
+    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('hand-coins')} Collections · this month</div><strong>${fmt(m.collections||0)}</strong></div>
+    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('banknote')} Total receivables</div><strong>${fmt(s.gross_outstanding)}</strong></div>
+    <div class="v31-metric"><div class="v31-metric-eyebrow">${icon('users')} Active borrowers</div><strong>${nfmt(activeBorrowers)}</strong><p>${nfmt(s.active_loans)} open loans</p></div>
+    <div class="v31-metric v31-metric-accent"><div class="v31-metric-eyebrow">${icon('calendar-days')} Due next 7 days</div><strong>${fmt(colInt.due_next_7_days||0)}</strong></div>
   </section>
   <div class="v35-dashboard-funding">${assetSourceMix()}${capitalSnapshot()}</div>
-  <div class="v31-analytical-grid"><section class="panel v31-chart-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">PORTFOLIO ACTIVITY</span><h3>Collections & disbursements</h3><p>Monthly cash receipts compared with loans released.</p></div><div class="range-toggle" aria-label="Chart time range"><button data-range="6" class="${UI.chartRange===6?'active':''}" aria-pressed="${UI.chartRange===6}">6M</button><button data-range="12" class="${UI.chartRange===12?'active':''}" aria-pressed="${UI.chartRange===12}">12M</button></div></div><div class="v31-chart-stats"><span><i class="v31-chart-dot teal"></i> Collections <strong>${fmt(s.collections)}</strong></span><span><i class="v31-chart-dot pale"></i> Net loan releases <strong>${fmt(s.net_releases)}</strong></span></div><div class="chart-shell">${chartSVG(monthly)}</div></section>
+  <div class="v31-analytical-grid"><section class="panel v31-chart-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">PORTFOLIO ACTIVITY</span><h3>Collections & disbursements</h3></div><div class="range-toggle" aria-label="Chart time range"><button data-range="6" class="${UI.chartRange===6?'active':''}" aria-pressed="${UI.chartRange===6}">6M</button><button data-range="12" class="${UI.chartRange===12?'active':''}" aria-pressed="${UI.chartRange===12}">12M</button></div></div><div class="v31-chart-stats"><span><i class="v31-chart-dot teal"></i> Collections <strong>${fmt(s.collections)}</strong></span><span><i class="v31-chart-dot pale"></i> Net loan releases <strong>${fmt(s.net_releases)}</strong></span></div><div class="chart-shell">${chartSVG(monthly)}</div></section>
   ${portfolioRisk()}</div>
   ${assetBridgeChart()}
-  <div class="v31-operations-grid">${collectionPriorities()}<section class="panel v31-mix-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">EXPOSURE</span><h3>Portfolio allocation</h3><p>Outstanding principal by loan product.</p></div><button class="v31-text-button" data-page="loans">All loans ${icon('arrow-right')}</button></div>${productMix()}<div class="v31-utilization-stat"><span>Capital in active principal</span><strong>${Number(s.capital_deployed_pct).toFixed(1)}%</strong></div><div class="v31-bar-track"><span style="width:${Math.max(0,Math.min(100,s.capital_deployed_pct))}%"></span></div></section></div>
+  <div class="v31-operations-grid">${collectionPriorities()}<section class="panel v31-mix-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">EXPOSURE</span><h3>Portfolio allocation</h3></div><button class="v31-text-button" data-page="loans">All loans ${icon('arrow-right')}</button></div>${productMix()}<div class="v31-utilization-stat"><span>Capital in active principal</span><strong>${Number(s.capital_deployed_pct).toFixed(1)}%</strong></div><div class="v31-bar-track"><span style="width:${Math.max(0,Math.min(100,s.capital_deployed_pct))}%"></span></div></section></div>
   <div class="v31-bottom-grid"><section class="panel v31-compact-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">ACTIVITY</span><h3>Recent transactions</h3></div><button data-page="transactions" class="v31-text-button">Cashbook ${icon('arrow-right')}</button></div>${activityList()||'<div class="v31-queue-empty">No transactions recorded yet.</div>'}</section><section class="panel v31-compact-panel"><div class="v31-section-head"><div><span class="v31-eyebrow">CONCENTRATION</span><h3>Largest borrower exposure</h3></div><button data-page="borrowers" class="v31-text-button">Borrowers ${icon('arrow-right')}</button></div>${concentration.filter(x=>x.amount>0).slice(0,4).map(x=>`<div class="v31-exposure-row"><div><strong>${esc(x.name)}</strong><span>${fmt(x.amount)} <b>${x.share.toFixed(1)}%</b></span></div><div class="v31-bar-track"><span style="width:${Math.max(0,Math.min(100,x.share))}%"></span></div></div>`).join('')||'<div class="v31-queue-empty">No outstanding borrower exposure.</div>'}</section></div>
  </div>`;
 }
@@ -401,7 +401,20 @@ function controlsPage(){
  <p class="v36-integrity-foot">Imported historical receipt references are checked against current entries. Prior workbook summary figures are not used as the target for today's ledger balances.</p>`;
 }
 
-function render(){if(!UI.data)return;document.getElementById('breadcrumb').textContent=HEADINGS[UI.page];document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===UI.page));document.getElementById('nav-warning').style.display=UI.data.live_integrity?.checks?.some(c=>!c.passed)?'block':'none';main.innerHTML=({dashboard,loans:loansPage,borrowers:borrowersPage,collections:collectionsPage,transactions:transactionsPage,schedule:schedulePage,reports:reportsPage,controls:controlsPage}[UI.page])()}
+function render(){if(!UI.data)return;document.getElementById('breadcrumb').textContent=HEADINGS[UI.page];document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x.dataset.page===UI.page));document.getElementById('nav-warning').style.display=UI.data.live_integrity?.checks?.some(c=>!c.passed)?'block':'none';if(main.dataset)main.dataset.coveView=UI.page;main.innerHTML=({dashboard,loans:loansPage,borrowers:borrowersPage,collections:collectionsPage,transactions:transactionsPage,reports:reportsPage,schedule:schedulePage,controls:controlsPage}[UI.page])();if(typeof main.querySelector==='function')removeDuplicateTableTitles(main)}
+// A table with the exact same title as its page should not repeat that title.
+// Distinct section names remain visible and semantic tables keep their column headings.
+function removeDuplicateTableTitles(root){
+ const normalize=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
+ const title=normalize(root.querySelector('.page-head h1')?.textContent);
+ if(!title)return;
+ root.querySelectorAll('.table-card > .table-section-header h3, .table-card > .panel-head h3').forEach(heading=>{
+  if(normalize(heading.textContent)!==title)return;
+  const wrapper=heading.closest('.table-section-header, .panel-head');
+  heading.remove();
+  if(wrapper && !normalize(wrapper.textContent) && !wrapper.querySelector('button,a,input,select'))wrapper.remove();
+ });
+}
 function modal(title,subtitle,body){modRoot.innerHTML=`<div class="modal-backdrop" id="modal-backdrop"><div class="dialog" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modal-head"><div><h2>${title}</h2><p>${subtitle}</p></div><button class="close" data-close-modal aria-label="Close dialog">${icon('x')}</button></div><div class="modal-content">${body}</div></div></div>`}
 function fld(name,label,type='text',value='',opts=''){return `<div class="field"><label for="${name}">${label}</label><input type="${type}" name="${name}" id="${name}" value="${esc(value)}" ${opts}></div>`}
 function sel(name,label,options,selected=''){return `<div class="field"><label for="${name}">${label}</label><select id="${name}" name="${name}">${options.map(x=>`<option value="${esc(x[0])}" ${String(x[0])===String(selected)?'selected':''}>${esc(x[1])}</option>`).join('')}</select></div>`}
