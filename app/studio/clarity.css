@@ -1,0 +1,331 @@
+/* Cove 3.10.4 — Clarity. Light-first, contrast-oriented companion to Nocturne.
+   Scoped to #cove-shell[data-cove-theme=light] so dark mode remains intact.
+   Presentation-only: no changes to portfolio numbers or transactions. */
+.shell[data-cove-theme="light"] {
+  --cove-ink:#17363c;
+  --cove-muted:#4e6970;
+  --cove-lime:#c7ed61;
+  --cove-teal:#08796c;
+  --cove-border:#d6e6e2;
+  --white:#ffffff;
+  --bg:#f2f7f5;
+  --ink:#17363c;
+  --muted:#526d72;
+  --line:#dbe8e4;
+  --v31-canvas:#f2f7f5;
+  --v31-ink:#17363c;
+  --v31-muted:#536f75;
+  --v31-line:#e0ebe8;
+  --v31-offwhite:#f6faf8;
+  --v31-teal:#087a6c;
+  color-scheme:light;
+  color:#17363c;
+  background:#f2f7f5;
+}
+body:has(#cove-shell[data-cove-theme="light"]) {color-scheme:light;background:#f2f7f5}
+.shell[data-cove-theme="light"] .workspace {
+  background:radial-gradient(ellipse at 80% -280px,rgba(23,163,138,.11),transparent 52%),#f2f7f5;
+}
+.shell[data-cove-theme="light"] .workspace:before {border-color:rgba(41,129,119,.13);box-shadow:0 0 0 63px rgba(31,149,126,.025),0 0 0 112px rgba(24,130,125,.019)}
+/* Retain the dark sidebar for orientation and a polished two-tone appearance. */
+.shell[data-cove-theme="light"] .sidebar {border-right:1px solid #164a4b}
+/* Visible global navigation and working theme toggle. */
+.cove-theme-toggle {display:grid;place-items:center;min-width:36px;min-height:36px}
+.cove-theme-toggle svg{width:17px;height:17px}
+.shell[data-cove-theme="light"] .topbar {
+  color:#1a4042;
+  background:rgba(255,255,255,.94);
+  border-bottom:1px solid #dbe7e3;
+  box-shadow:0 2px 10px rgba(15,76,61,.025);
+}
+.shell[data-cove-theme="light"] .breadcrumb{color:#47656a;font-weight:750}
+.shell[data-cove-theme="light"] .breadcrumb strong{color:#086c60}
+.shell[data-cove-theme="light"] .secure-label{color:#256d62}
+.shell[data-cove-theme="light"] .top-live{background:#0aa987}
+.shell[data-cove-theme="light"] .icon-btn,
+.shell[data-cove-theme="light"] .mobile-menu{background:#f8fbfa;color:#195951;border:1px solid #d6e5df;box-shadow:none}
+.shell[data-cove-theme="light"] .icon-btn:hover,
+.shell[data-cove-theme="light"] .mobile-menu:hover{background:#e7f4ef;border-color:#a4ccc1}
+.shell[data-cove-theme="light"] .top-avatar{background:#d5eee1;color:#0d604c}
+.shell[data-cove-theme="light"] .main{color:#17363c}
+.shell[data-cove-theme="light"] .main .page-head .eyebrow{color:#087667;font-weight:850;letter-spacing:1.45px}
+.shell[data-cove-theme="light"] .main .page-head h1{color:#142f36;font-size:clamp(28px,2.55vw,36px)}
+.shell[data-cove-theme="light"] .main .page-head p{color:#516d73;font-size:12px}
+.shell[data-cove-theme="light"] .main .asof{background:#fff;border:1px solid #c9ded6;color:#285850;box-shadow:0 2px 7px rgba(14,65,55,.035)}
+.shell[data-cove-theme="light"] .main .asof svg{color:#2a776c}
+.shell[data-cove-theme="light"] .main .asof input{color:#194e48;color-scheme:light}
+.shell[data-cove-theme="light"] .main .btn.primary{background:#087c6c;color:#fff;border:1px solid #087c6c;box-shadow:0 5px 15px rgba(6,113,92,.13)}
+.shell[data-cove-theme="light"] .main .btn.primary:hover{background:#066757;color:#fff}
+.shell[data-cove-theme="light"] .main .btn.outline{background:#fff;color:#096c61;border:1px solid #bdd9d1}
+.shell[data-cove-theme="light"] .main .btn.outline:hover{background:#e9f6f0;border-color:#81bdb0}
+/* Keep the hero deep teal: a small high-contrast anchor, not a full dark canvas. */
+.shell[data-cove-theme="light"] .v31-hero{
+  background:radial-gradient(ellipse at 48% 62%,rgba(43,169,143,.26),transparent 53%),linear-gradient(112deg,#103a43,#08685e 67%,#073842);
+  border:1px solid #176e67;
+  box-shadow:0 12px 30px rgba(18,66,56,.14);
+}
+.shell[data-cove-theme="light"] .v31-hero .v31-overline{color:#e0f4ee}
+.shell[data-cove-theme="light"] .v31-hero-secondary{background:rgba(1,32,37,.15)}
+.shell[data-cove-theme="light"] .v31-hero-secondary span{color:#deefeb}
+.shell[data-cove-theme="light"] .v31-hero-secondary strong{color:#fff}
+/* Core card system: white panels, dark titles, and obvious boundaries. */
+.shell[data-cove-theme="light"] .v31-dashboard-root .panel,
+.shell[data-cove-theme="light"] .main > .panel,
+.shell[data-cove-theme="light"] .main > .split .panel,
+.shell[data-cove-theme="light"] .main > .cards3 .small-card,
+.shell[data-cove-theme="light"] .main .table-card,
+.shell[data-cove-theme="light"] .main .metric-tile,
+.shell[data-cove-theme="light"] .main > .small-card {
+  color:#17363c;
+  background:#fff;
+  border:1px solid #d8e6e2;
+  box-shadow:0 4px 18px rgba(20,75,61,.045);
+}
+.shell[data-cove-theme="light"] .v31-dashboard-root .panel:before{border-color:rgba(9,131,108,.07)}
+.shell[data-cove-theme="light"] .v31-eyebrow,
+.shell[data-cove-theme="light"] .v31-overline{color:#126b64;font-weight:850}
+.shell[data-cove-theme="light"] .v31-section-head h3,
+.shell[data-cove-theme="light"] .v31-block-heading h2,
+.shell[data-cove-theme="light"] .v32-header h3,
+.shell[data-cove-theme="light"] .v35-source-head h2,
+.shell[data-cove-theme="light"] .v35-contract-heading h2,
+.shell[data-cove-theme="light"] .v36-head h3,
+.shell[data-cove-theme="light"] .main .panel-head h3,
+.shell[data-cove-theme="light"] .main .table-section-header h3,
+.shell[data-cove-theme="light"] .main .small-card strong,
+.shell[data-cove-theme="light"] .main .metric-tile strong,
+.shell[data-cove-theme="light"] .main .bar-entry-top strong {
+  color:#143640;
+  opacity:1;
+}
+.shell[data-cove-theme="light"] .v31-section-head h3,
+.shell[data-cove-theme="light"] .v32-header h3{font-size:clamp(18px,1.6vw,23px);font-weight:800;letter-spacing:-.55px}
+.shell[data-cove-theme="light"] .v31-section-head p,
+.shell[data-cove-theme="light"] .v32-header p,
+.shell[data-cove-theme="light"] .v31-chart-stats>span,
+.shell[data-cove-theme="light"] .v31-risk-heading p,
+.shell[data-cove-theme="light"] .v31-risk-caption,
+.shell[data-cove-theme="light"] .main .panel-head p,
+.shell[data-cove-theme="light"] .main .table-section-header span,
+.shell[data-cove-theme="light"] .main .small-card p,
+.shell[data-cove-theme="light"] .main .metric-tile small,
+.shell[data-cove-theme="light"] .main .metric-tile em{color:#516e72;opacity:1}
+.shell[data-cove-theme="light"] .v31-text-button,
+.shell[data-cove-theme="light"] .v31-risk-heading .v31-text-button,
+.shell[data-cove-theme="light"] .panel-link{color:#087365;text-decoration-color:#a9d6cc}
+/* Summary tiles: clearer names and values, with visible color contrast. */
+.shell[data-cove-theme="light"] .v31-metric,
+.shell[data-cove-theme="light"] .v31-metric-accent {
+  background:linear-gradient(145deg,#fff,#f9fcfb);
+  border:1px solid #d9e8e4;
+  box-shadow:0 5px 16px rgba(16,67,57,.045);
+}
+.shell[data-cove-theme="light"] .v31-metric-accent{background:linear-gradient(138deg,#f4fbf7,#fff);border-color:#b7d8ce}
+.shell[data-cove-theme="light"] .v31-metric-eyebrow{color:#3c6467;font-size:11px;font-weight:750}
+.shell[data-cove-theme="light"] .v31-metric-eyebrow svg{color:#087b69}
+.shell[data-cove-theme="light"] .v31-metric>strong{color:#123840;font-weight:800}
+.shell[data-cove-theme="light"] .v31-metric p{color:#56757a;font-size:10px}
+/* Funding doughnut and contractual interest. */
+.shell[data-cove-theme="light"] .v310-asset-mix,
+.shell[data-cove-theme="light"] .v3102-interest-panel{
+  background:#fff!important;
+  color:#17363c;
+  border:1px solid #d3e5df!important;
+  box-shadow:0 5px 20px rgba(18,68,53,.05);
+}
+.shell[data-cove-theme="light"] .v310-asset-mix .v35-source-head h2,
+.shell[data-cove-theme="light"] .v3102-interest-panel .v35-contract-heading h2{color:#133740}
+.shell[data-cove-theme="light"] .v310-total-assets span{color:#567579;font-size:10px}
+.shell[data-cove-theme="light"] .v310-total-assets strong{color:#087665;font-size:17px}
+.shell[data-cove-theme="light"] .v310-donut:after{background:#fff;box-shadow:0 0 0 1px #dbe9e4}
+.shell[data-cove-theme="light"] .v310-donut-core strong{color:#153942}
+.shell[data-cove-theme="light"] .v310-donut-core small{color:#5b7479}
+.shell[data-cove-theme="light"] .v310-mix-row{border-bottom:1px solid #e0eae7;font-size:12px}
+.shell[data-cove-theme="light"] .v310-mix-label{color:#244b52}
+.shell[data-cove-theme="light"] .v310-mix-row strong{color:#173f43}
+.shell[data-cove-theme="light"] .v310-mix-percent{color:#42686b}
+.shell[data-cove-theme="light"] .v310-capital-strip{background:#f3f9f6;border:1px solid #dcebe5}
+.shell[data-cove-theme="light"] .v310-capital-strip>div{border-right-color:#dae8e3}
+.shell[data-cove-theme="light"] .v310-capital-strip span{color:#526f72;font-size:10px}
+.shell[data-cove-theme="light"] .v310-capital-strip strong{color:#174148}
+.shell[data-cove-theme="light"] .v310-capital-strip .v310-capital-net span,
+.shell[data-cove-theme="light"] .v310-capital-strip .v310-capital-net strong{color:#096e60}
+.shell[data-cove-theme="light"] .v310-signed-heading{color:#21545c}
+.shell[data-cove-theme="light"] .v310-signed-heading span{color:#526f72}
+.shell[data-cove-theme="light"] .v37-source-chart-label b,
+.shell[data-cove-theme="light"] .v37-source-chart-label strong{color:#23434c}
+.shell[data-cove-theme="light"] .v37-diverging-bar,
+.shell[data-cove-theme="light"] .v37-bar-negative,
+.shell[data-cove-theme="light"] .v37-bar-positive{background:#e9f2ee;border-color:#dce9e4}
+/* The amount card remains dark for hierarchy; the chart beside it is light. */
+.shell[data-cove-theme="light"] .v3102-interest-panel .v3102-contract-card{
+  border-color:#13957d;
+  background:radial-gradient(circle at 90% 8%,rgba(187,242,105,.18),transparent 52%),linear-gradient(137deg,#086957,#0d8772);
+}
+.shell[data-cove-theme="light"] .v3102-contract-card .v31-overline{color:#dcf9ed}
+.shell[data-cove-theme="light"] .v3102-contract-card .v31-feature-value{color:#fff}
+.shell[data-cove-theme="light"] .v3102-contract-card small{color:#e0f7ef}
+.shell[data-cove-theme="light"] .v3102-chart-head>span{color:#285c60;font-size:11px;font-weight:800;letter-spacing:.45px}
+.shell[data-cove-theme="light"] .v3102-chart-toggle{background:#f1f7f4;border:1px solid #d6e5df}
+.shell[data-cove-theme="light"] .v3102-chart-toggle button{color:#456768}
+.shell[data-cove-theme="light"] .v3102-chart-toggle button.active{background:#087566;color:#fff;box-shadow:none}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-chart-guide{stroke:#dce7e4}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-axis-label{fill:#4d6d70;font-size:12px}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-month-label{fill:#2c555b;font-size:12px}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-interest-bar{fill:#45bfa4}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-interest-bar.is-current{fill:#087b6a}
+.shell[data-cove-theme="light"] .v3102-interest-svg .v3102-interest-bar.is-negative{fill:#be6d62}
+.shell[data-cove-theme="light"] .v3102-chart-foot{color:#526f73}
+.shell[data-cove-theme="light"] .v3102-maturity-row{border-top:1px solid #e2ebe8}
+.shell[data-cove-theme="light"] .v3102-maturity-row>div{color:#43666b}
+.shell[data-cove-theme="light"] .v3102-maturity-row strong{color:#173e45}
+.shell[data-cove-theme="light"] .v3102-maturity-row button{color:#087567}
+.shell[data-cove-theme="light"] .v3102-maturity-row svg{color:#087b69}
+.shell[data-cove-theme="light"] .v36-interest-details{background:#f7fbfa;border-color:#d9eae3;color:#24474a}
+.shell[data-cove-theme="light"] .v36-interest-details summary{color:#0b6c60}
+.shell[data-cove-theme="light"] .v36-interest-details summary small{color:#537278}
+.shell[data-cove-theme="light"] .v36-interest-details .v36-interest-table th,
+.shell[data-cove-theme="light"] .v36-interest-details .v36-interest-table td{color:#27484c;border-color:#e2ebe8}
+.shell[data-cove-theme="light"] .v36-interest-details .v36-interest-table tfoot{background:#e3f4ee}
+.shell[data-cove-theme="light"] .v36-interest-caption{color:#546e74}
+/* Collections / risk and explanatory labels; all remain readable. */
+.shell[data-cove-theme="light"] .v31-chart-stats strong,
+.shell[data-cove-theme="light"] .v31-risk-value,
+.shell[data-cove-theme="light"] .v31-risk-top strong,
+.shell[data-cove-theme="light"] .v31-risk-panel strong,
+.shell[data-cove-theme="light"] .v31-queue-amount,
+.shell[data-cove-theme="light"] .v31-queue-row strong,
+.shell[data-cove-theme="light"] .v31-exposure-row strong,
+.shell[data-cove-theme="light"] .v31-compact-panel .activity-data strong{color:#153d42}
+.shell[data-cove-theme="light"] .v31-risk-label,
+.shell[data-cove-theme="light"] .v31-aging-labels,
+.shell[data-cove-theme="light"] .v31-queue-borrower small,
+.shell[data-cove-theme="light"] .v31-exposure-row span,
+.shell[data-cove-theme="light"] .v31-compact-panel .activity-data small,
+.shell[data-cove-theme="light"] .v31-utilization-stat,
+.shell[data-cove-theme="light"] .v31-utilization-stat span{color:#536e73}
+.shell[data-cove-theme="light"] .v31-aging-labels b{color:#183c41}
+.shell[data-cove-theme="light"] .v31-risk-value.v31-risk-alert{color:#a9493e}
+.shell[data-cove-theme="light"] .v31-dashboard-root .chart-shell .subtle-line{stroke:#dce9e5}
+.shell[data-cove-theme="light"] .v31-dashboard-root .chart-shell .axis-label{fill:#456871;font-size:11px}
+.shell[data-cove-theme="light"] .v31-bar-track,
+.shell[data-cove-theme="light"] .v31-mini-track{background:#dfebe7}
+.shell[data-cove-theme="light"] .v31-bar-track span,
+.shell[data-cove-theme="light"] .v31-mini-track i{background:linear-gradient(90deg,#0b8c7a,#54c5a6)}
+.shell[data-cove-theme="light"] .v31-risk-disclaimer{color:#527076;border-top-color:#e1ebe7}
+.shell[data-cove-theme="light"] .v31-risk-small-metrics span{color:#526e75}
+.shell[data-cove-theme="light"] .v31-risk-small-metrics strong{color:#183e44}
+.shell[data-cove-theme="light"] .v31-queue-row,
+.shell[data-cove-theme="light"] .v31-exposure-row,
+.shell[data-cove-theme="light"] .v31-compact-panel .activity-row{border-color:#e0eae7}
+.shell[data-cove-theme="light"] .v31-dashboard-root .badge{border-color:#cce2d8}
+.shell[data-cove-theme="light"] .v31-operations-grid .person-icon{background:#e3f3ec;color:#087c69}
+.shell[data-cove-theme="light"] .v31-mix-panel .donut:before{background:#fff}
+.shell[data-cove-theme="light"] .v31-mix-panel .donut-center strong{color:#153b42}
+.shell[data-cove-theme="light"] .v31-mix-panel .donut-center small{color:#526f75}
+.shell[data-cove-theme="light"] .v31-mix-panel .mix-row,
+.shell[data-cove-theme="light"] .v31-mix-panel .mix-row label{color:#47676d}
+/* Historical asset-movement module: the source of the unreadable title/legend bug. */
+.shell[data-cove-theme="light"] .v32-asset-panel{color:#17363c}
+.shell[data-cove-theme="light"] .v32-header h3{color:#14353c!important;opacity:1;font-size:22px}
+.shell[data-cove-theme="light"] .v32-header p{color:#506d74;font-size:12px}
+.shell[data-cove-theme="light"] .v32-controls{background:#f3f9f6;border-color:#d9e6e1}
+.shell[data-cove-theme="light"] .v32-controls button{color:#305d60;font-size:11px}
+.shell[data-cove-theme="light"] .v32-controls button.active{background:#087969;color:#fff}
+.shell[data-cove-theme="light"] .v32-controls .v32-export{border-left-color:#d3e4de;color:#087466}
+.shell[data-cove-theme="light"] .v32-summary{background:#f7faf9;border-color:#dbe9e4}
+.shell[data-cove-theme="light"] .v32-summary>div+div{border-left-color:#dbe9e4}
+.shell[data-cove-theme="light"] .v32-summary span{color:#496b70}
+.shell[data-cove-theme="light"] .v32-summary strong{color:#193e46}
+.shell[data-cove-theme="light"] .v32-summary>div:last-child{background:#e7f4ee}
+.shell[data-cove-theme="light"] .v32-summary>div:last-child strong{color:#066e5e}
+.shell[data-cove-theme="light"] .v32-legend{color:#385d64}
+.shell[data-cove-theme="light"] .v32-legend span{color:#46696e;font-size:11px;font-weight:650;opacity:1}
+.shell[data-cove-theme="light"] .v32-chart-scroll{background:#fff;border-color:#dceae6}
+.shell[data-cove-theme="light"] .v32-grid{stroke:#e3ebe8}
+.shell[data-cove-theme="light"] .v32-zero{stroke:#97b5b2}
+.shell[data-cove-theme="light"] .v32-axis{fill:#456b71;font-size:12px}
+.shell[data-cove-theme="light"] .v32-chart-footer{color:#42666c;font-size:11px}
+.shell[data-cove-theme="light"] .v32-adjustment-note{color:#8e5a1c}
+.shell[data-cove-theme="light"] .v32-breakdown{border-top-color:#e1ebe8}
+.shell[data-cove-theme="light"] .v32-breakdown summary{color:#087264}
+.shell[data-cove-theme="light"] .v32-breakdown th{background:#edf6f3;color:#375f64;font-weight:750}
+.shell[data-cove-theme="light"] .v32-breakdown td{color:#294e55}
+.shell[data-cove-theme="light"] .v32-breakdown th,
+.shell[data-cove-theme="light"] .v32-breakdown td{border-bottom-color:#deebe6}
+/* Operational tables: headers, rows, search, and compact results. */
+.shell[data-cove-theme="light"] .main .metric-strip{background:#e0ebe6;border-color:#d9e7e2}
+.shell[data-cove-theme="light"] .main .metric-tile{background:#fff}
+.shell[data-cove-theme="light"] .main .metric-tile+.metric-tile{border-left-color:#d8e5df}
+.shell[data-cove-theme="light"] .main .searchbox{background:#fff;border-color:#bfd8cf;color:#244d53}
+.shell[data-cove-theme="light"] .main .searchbox input,
+.shell[data-cove-theme="light"] .main input:not([type="checkbox"]):not([type="radio"]),
+.shell[data-cove-theme="light"] .main select,
+.shell[data-cove-theme="light"] .main textarea{color:#16383d;color-scheme:light}
+.shell[data-cove-theme="light"] .main .searchbox input::placeholder{color:#5c7477}
+.shell[data-cove-theme="light"] .main .pill,
+.shell[data-cove-theme="light"] .main .cash-ledger-tabs button{background:#fff;color:#366469;border:1px solid #d0e0da}
+.shell[data-cove-theme="light"] .main .pill.active,
+.shell[data-cove-theme="light"] .main .cash-ledger-tabs button.active{background:#087b6a;color:#fff;border-color:#087b6a}
+.shell[data-cove-theme="light"] .main .data-table th,
+.shell[data-cove-theme="light"] .main .compact-table th{color:#3b6369;background:#f4f9f7;border-color:#dbe6e3;font-size:11px;font-weight:800;letter-spacing:.65px}
+.shell[data-cove-theme="light"] .main .data-table td,
+.shell[data-cove-theme="light"] .main .compact-table td{color:#28484f;border-color:#e1ebe7;font-size:12px}
+.shell[data-cove-theme="light"] .main .data-table td strong,
+.shell[data-cove-theme="light"] .main .compact-table td strong,
+.shell[data-cove-theme="light"] .main .person strong{color:#14373d}
+.shell[data-cove-theme="light"] .main .data-table td .cell-sub,
+.shell[data-cove-theme="light"] .main .data-table td .muted,
+.shell[data-cove-theme="light"] .main .person small,
+.shell[data-cove-theme="light"] .main .small-muted{color:#546f73}
+.shell[data-cove-theme="light"] .main .data-table tr.selectable:hover td{background:#eaf6f0}
+.shell[data-cove-theme="light"] .main .table-card{background:#fff;overflow-x:auto}
+.shell[data-cove-theme="light"] .main .badge{background:#e0f4eb;color:#086953}
+.shell[data-cove-theme="light"] .main .badge.red{background:#fbe8e5;color:#a44438}
+.shell[data-cove-theme="light"] .main .badge.gray{background:#ecf0f1;color:#456168}
+.shell[data-cove-theme="light"] .main .badge.warn{background:#fff1d8;color:#865e19}
+.shell[data-cove-theme="light"] .main .progressbar,
+.shell[data-cove-theme="light"] .main .bar-track{background:#e2ede7}
+.shell[data-cove-theme="light"] .main .callout,
+.shell[data-cove-theme="light"] .main .insight-note{background:#f5faf8;border-color:#dbe8e3;color:#32585d}
+.shell[data-cove-theme="light"] .main .callout p,
+.shell[data-cove-theme="light"] .main .insight-note p,
+.shell[data-cove-theme="light"] .main .callout strong{color:#376067}
+.shell[data-cove-theme="light"] .main .footnote,
+.shell[data-cove-theme="light"] .main .empty{color:#516e72}
+.shell[data-cove-theme="light"] .main .empty svg{color:#268879}
+.shell[data-cove-theme="light"] .v36-integrity-summary strong,
+.shell[data-cove-theme="light"] .v36-check strong{color:#183b42}
+.shell[data-cove-theme="light"] .v36-integrity-summary p,
+.shell[data-cove-theme="light"] .v36-check small{color:#537078}
+/* Guaranteed focus feedback in both appearances. */
+.shell[data-cove-theme="light"] :focus-visible{outline:3px solid #167c71!important;outline-offset:3px}
+.shell[data-cove-theme="light"] .v32-chart-scroll:focus-visible{outline-color:#127a6a!important}
+@media(max-width:650px){
+  .shell[data-cove-theme="light"] .main .page-head h1{font-size:28px}
+  .shell[data-cove-theme="light"] .v32-header h3{font-size:20px}
+  .shell[data-cove-theme="light"] .v32-summary span{font-size:10px}
+  .cove-theme-toggle{width:34px;min-width:34px;height:34px;min-height:34px}
+}
+
+/* Nocturne remains optional. Keep the specific lower-page title/legend readable there too. */
+.shell[data-cove-theme="dark"] .v32-header h3{color:#f4fbf8!important;opacity:1}
+.shell[data-cove-theme="dark"] .v32-header p{color:#c2dbd8}
+.shell[data-cove-theme="dark"] .v32-legend span{color:#d0e7e2;font-weight:650}
+.shell[data-cove-theme="dark"] .v32-axis{fill:#c1d9d8}
+.shell[data-cove-theme="dark"] .v32-grid{stroke:rgba(174,216,205,.22)}
+.shell[data-cove-theme="dark"] .v32-breakdown th{background:#15444a;color:#e3f3ed}
+.shell[data-cove-theme="dark"] .v32-breakdown td{color:#d7eae5}
+
+/* Text scale: avoid relying on tiny, pale UI labels for material financial data. */
+.shell[data-cove-theme="light"] .v31-chart-stats>span,
+.shell[data-cove-theme="light"] .v31-risk-label,
+.shell[data-cove-theme="light"] .v31-aging-labels>div,
+.shell[data-cove-theme="light"] .v32-legend span,
+.shell[data-cove-theme="light"] .v32-summary span,
+.shell[data-cove-theme="light"] .v310-capital-strip span,
+.shell[data-cove-theme="light"] .v3102-chart-head>span{font-size:12px}
+.shell[data-cove-theme="light"] .v31-risk-disclaimer,
+.shell[data-cove-theme="light"] .v3102-chart-foot{font-size:11px;line-height:1.55}
+.shell[data-cove-theme="light"] .v310-mix-label{font-size:12px}
+.shell[data-cove-theme="light"] .v31-queue-borrower strong{font-size:13px}

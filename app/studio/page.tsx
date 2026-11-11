@@ -4,10 +4,11 @@ import './premium.css';
 import './executive.css';
 import './asset-sources.css';
 import './nocturne.css';
+import './clarity.css';
 
 export default function Studio() {
   return <>
-    <div className="shell">
+    <div className="shell" id="cove-shell" data-cove-theme="light">
       <aside className="sidebar" id="sidebar">
         <a className="brand" href="#dashboard" aria-label="Cove Lending Studio">
           <span className="brand-mark"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M7 31L18.5 12L26.5 25L34 13L39 31" fill="none" stroke="currentColor" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
@@ -42,7 +43,7 @@ export default function Studio() {
       <div className="workspace">
         <header className="topbar">
           <div className="topbar-left"><button type="button" className="mobile-menu" id="mobile-menu" aria-label="Toggle menu" aria-expanded="false"><span data-icon="menu"/></button><span className="breadcrumb">COVE / <strong id="breadcrumb">Dashboard</strong></span></div>
-          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="icon-btn" id="quick-refresh" title="Refresh portfolio" aria-label="Refresh portfolio"><span data-icon="refresh-cw"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
+          <div className="topbar-right"><span className="secure-label"><span className="top-live"/> WORKSPACE LIVE</span><button type="button" className="icon-btn cove-theme-toggle" id="theme-toggle" title="Switch to dark theme" aria-label="Switch to dark theme" aria-pressed="false"><span data-icon="moon"/></button><button type="button" className="icon-btn" id="quick-refresh" title="Refresh portfolio" aria-label="Refresh portfolio"><span data-icon="refresh-cw"/></button><span className="top-avatar" title="Portfolio owner">CO</span></div>
         </header>
         <main className="main" id="main"><div className="loading"><div className="spinner"/><h2>Preparing your portfolio</h2><p>Loading your lending workspace...</p></div></main>
       </div>

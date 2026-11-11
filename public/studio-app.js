@@ -35,9 +35,35 @@ const ICONS={
 'circle-dollar-sign':'<circle cx="12" cy="12" r="10"/><path d="M12 6v12M16 9a4 4 0 0 0-4-2c-2 0-4 1-4 3s2 2 4 2 4 0 4 3-2 3-4 3a4 4 0 0 1-4-2"/>',
 'bar-chart-3':'<path d="M3 3v18h18M7 17v-6m5 6V7m5 10V4"/>',
 'eye':'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
-'bell':'<path d="M15 17H5a2 2 0 0 1-2-2c0-1.4.7-2.6 1.8-3.3V9a5.2 5.2 0 1 1 10.4 0v2.7c1.1.7 1.8 1.9 1.8 3.3a2 2 0 0 1-2 2Z"/><path d="M9 20a2 2 0 0 0 4 0"/>'};
+'bell':'<path d="M15 17H5a2 2 0 0 1-2-2c0-1.4.7-2.6 1.8-3.3V9a5.2 5.2 0 1 1 10.4 0v2.7c1.1.7 1.8 1.9 1.8 3.3a2 2 0 0 1-2 2Z"/><path d="M9 20a2 2 0 0 0 4 0"/>',
+'moon':'<path d="M20.9 13.3A9 9 0 0 1 10.7 3.1 9 9 0 1 0 20.9 13.3Z"/>',
+'sun':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>'};
 const icon=(name,extra='')=>`<svg ${extra} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||ICONS.info}</svg>`;
 document.querySelectorAll('[data-icon]').forEach(el=>{el.innerHTML=icon(el.dataset.icon)});
+/* V3.10.4: light-first appearance with an optional persisted Nocturne mode.
+   A missing or blocked localStorage does not prevent the dashboard from loading. */
+(function initCoveAppearance(){
+  const shell=document.getElementById('cove-shell');
+  const control=document.getElementById('theme-toggle');
+  if(!shell||!control||!shell.dataset||typeof control.setAttribute!=='function'||typeof control.addEventListener!=='function')return;
+  function applyTheme(mode,persist){
+    const theme=mode==='dark'?'dark':'light';
+    shell.dataset.coveTheme=theme;
+    const next=theme==='light'?'dark':'light';
+    const label=`Switch to ${next} theme`;
+    control.setAttribute('aria-label',label);
+    control.setAttribute('title',label);
+    control.setAttribute('aria-pressed',String(theme==='dark'));
+    const drawing=typeof control.querySelector==='function'?control.querySelector('[data-icon]'):null;
+    if(drawing){drawing.dataset.icon=theme==='light'?'moon':'sun';drawing.innerHTML=icon(drawing.dataset.icon)}
+    if(persist){try{window.localStorage.setItem('cove-appearance',theme)}catch{}}
+  }
+  let saved='light';
+  try{saved=window.localStorage.getItem('cove-appearance')||'light'}catch{}
+  applyTheme(saved,false);
+  control.addEventListener('click',()=>applyTheme(shell.dataset.coveTheme==='light'?'dark':'light',true));
+})();
+
 const esc=(value)=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PHP=new Intl.NumberFormat('en-PH',{style:'currency',currency:'PHP',minimumFractionDigits:0,maximumFractionDigits:2});
 const fmt=n=>PHP.format(Number(n||0)).replace('PHP','₱');

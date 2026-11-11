@@ -1,3 +1,12 @@
+## 3.10.4 — Clarity Light Theme & Readability Repair (November 11, 2026)
+
+- Defaulted the authenticated Cove Studio workspace to **Clarity Light** while retaining the Nocturne appearance through a working top-bar toggle.
+- Kept the teal navigation sidebar and portfolio hero; replaced the surrounding near-black canvas with a premium off-white workspace and white content cards.
+- Repaired the nearly invisible **Factors increasing assets** heading and strengthened chart legends, axis labels, summary labels, table headers and row contrast throughout `/studio`.
+- Increased important label font sizes and added clear keyboard focus states for both desktop and mobile.
+- Theme choice persists locally; safely falls back to Light if browser storage is unavailable.
+- No loan, receipt, cashbook, funding or financial calculation changes; no Supabase migration.
+
 ## V3.10.3 — Nocturne premium dashboard styling (2026-11-09)
 
 - Applies the approved dark teal, mint and lime visual direction to the principal Cove workspace with more compact and consistent dashboard spacing.

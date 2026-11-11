@@ -1,0 +1,17 @@
+{
+  "version": "3.10.4",
+  "release": "Clarity Light Theme & Readability Repair",
+  "base_version": "3.10.3",
+  "requires_supabase_migration": false,
+  "modifies_financial_ledger": false,
+  "files": [
+    "app/studio/page.tsx",
+    "app/studio/clarity.css",
+    "public/studio-app.js",
+    "tests/v3104-clarity-theme.test.mjs",
+    "package.json",
+    "CHANGELOG.md",
+    "UPGRADE_V3_10_4.md",
+    "V3_10_4_RELEASE_MANIFEST.json"
+  ]
+}
