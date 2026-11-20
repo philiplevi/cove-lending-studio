@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@/lib/supabase';
-import {buildState,type LedgerDataset} from '@/lib/ledger';
+import {fullDataset} from '@/lib/read-ledger';
+import {buildState} from '@/lib/ledger';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 type Params={params:Promise<{path:string[]}>};
@@ -13,28 +14,6 @@ async function authContext(){
   if(memberError) throw Error('500|Database permissions are not configured. Apply the Cove migration.');
   if(!member) throw Error('403|No workspace found for this account. Create a new account after applying the migration.');
   return{client,workspace:member.workspace_id,role:member.role,user};
-}
-async function selectAll(client:Awaited<ReturnType<typeof createClient>>,table:string,workspace:string,limit=10000){
-  const rows:Record<string,unknown>[]=[];
-  for(let offset=0;offset<limit;offset+=1000){
-    const query=client.from(table).select('*').eq('workspace_id',workspace);
-    const sorted=table==='installments'?query.order('loan_id').order('installment_no'):query.order(table==='legacy_baselines'?'workspace_id':table==='loan_voids'?'loan_id':'id');
-    const {data,error}=await sorted.range(offset,offset+999);
-    if(error){
-      // V3.8 tables are additive. Keep existing ledger views available if deployment precedes migration.
-      if(['funding_conversions','cashbook_corrections'].includes(table)&&(/PGRST205|42P01/.test(String(error.code||''))||/schema cache|does not exist/i.test(error.message)))return [];
-      throw Error('500|Could not load '+table+': '+error.message);
-    }
-    rows.push(...(data||[])); if(!data||data.length<1000) return rows;
-  }
-  throw Error('422|Portfolio exceeds current client projection capacity. Upgrade to paginated SQL reporting.');
-}
-async function fullDataset(ctx:Awaited<ReturnType<typeof authContext>>){
-  const {client,workspace}=ctx;
-  const names=['borrowers','products','loans','installments','payments','capital','outflows','audit_log','legacy_baselines','loan_voids','loan_extensions','loan_corrections','cash_accounts','cash_allocations','account_reconciliations','collection_followups','servicing_notes','funding_conversions','cashbook_corrections'] as const;
-  const arrays=await Promise.all(names.map(name=>selectAll(client,name,workspace,name==='audit_log'?1000:10000)));
-  const out:Record<string,Record<string,unknown>[]>={};names.forEach((key,i)=>out[key]=arrays[i]);
-  return {...out,baseline:out.legacy_baselines?.[0]||null} as unknown as LedgerDataset;
 }
 function fail(e:unknown){const msg=e instanceof Error?e.message:'Request failed';const m=/^(401|403|422|500)\|(.*)$/.exec(msg);const code=m?Number(m[1]):400;return json({error:m?m[2]:msg},code)}
 

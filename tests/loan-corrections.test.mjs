@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {buildState} from '../lib/ledger.ts';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const sql=read('supabase/migrations/202610220001_loan_corrections.sql');
-const api=read('app/api/[...path]/route.ts');
+const api=read('app/api/[...path]/route.ts') + read('lib/read-ledger.ts');
 const ui=read('public/studio-app.js');
 const css=read('app/studio/premium.css');
 

@@ -61,3 +61,15 @@ test('navigation and dashboard keep one capital source mix, while statements are
  assert.match(css,/@media\(max-width:700px\)/);
  assert.match(statements,/\/api\/state\?as_of=/);
 });
+
+test('Folio exports period aggregates and uses the Manila reporting cutoff', async () => {
+ const {monthlyReport, reportingDates} = await import('../lib/folio-monthly.ts');
+ assert.equal(reportingDates('2026-12','2026-11-20'), null);
+ assert.equal(reportingDates('2026-00','2026-11-20'), null);
+ assert.deepEqual(reportingDates('2024-02','2026-11-20'),{opening:'2024-01-31',asOf:'2024-02-29'});
+ const dates = reportingDates('2026-10','2026-10-21');
+ const result = monthlyReport(fixture(),'2026-10',dates);
+ assert.equal(result.asOf,'2026-10-21');
+ assert.deepEqual([result.revenue,result.expenses,result.surplus,result.assets],[10000,10000,0,80000]);
+ assert.doesNotMatch(JSON.stringify(result),/Example|borrower_id|contact|C1/);
+});

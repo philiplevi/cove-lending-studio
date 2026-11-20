@@ -6,6 +6,8 @@ export async function middleware(request: NextRequest) {
   const pathname=request.nextUrl.pathname;
   // Auth and diagnostics must remain reachable even if Supabase is down/misconfigured.
   if (pathname==='/login' || pathname==='/api/auth' || pathname==='/api/health') return NextResponse.next({request});
+  // The Folio endpoint authenticates a workspace-scoped reporting integration.
+  if (pathname==='/api/folio/monthly' && request.method==='GET') return NextResponse.next({request});
   let response=NextResponse.next({request});
   try {
     const {url,key}=supabaseSettings();

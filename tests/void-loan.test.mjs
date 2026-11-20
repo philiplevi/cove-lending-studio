@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url),'utf8');
 const sql = read('supabase/migrations/202610170001_void_test_loans.sql');
-const api = read('app/api/[...path]/route.ts');
+const api = read('app/api/[...path]/route.ts') + read('lib/read-ledger.ts');
 const ui = read('public/studio-app.js');
 const ledger = read('lib/ledger.ts');
 test('loan void migration retains loan/receipt records, blocks imported loans, and requires owner',()=>{
