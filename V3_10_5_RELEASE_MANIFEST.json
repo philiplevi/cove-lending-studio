@@ -1,0 +1,15 @@
+{
+  "version": "3.10.5",
+  "description": "Whole peso dashboard display, centavo-accurate ledger",
+  "requires_migration": false,
+  "changed_files": [
+    "public/studio-app.js",
+    "package.json",
+    "tests/v3101-asset-donut.test.mjs",
+    "tests/v3102-dashboard-interest-chart.test.mjs",
+    "tests/v3105-whole-peso-dashboard.test.mjs",
+    "CHANGELOG.md",
+    "UPGRADE_V3_10_5.md",
+    "V3_10_5_RELEASE_MANIFEST.json"
+  ]
+}

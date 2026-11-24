@@ -1,3 +1,8 @@
+## V3.10.5 — Whole-Peso Dashboard Display
+- All Dashboard monetary figures now display rounded whole Philippine pesos, avoiding visual clutter from centavos.
+- Financial record precision, receipt allocations, full-detail screens, accounting exports, and database values remain unchanged.
+- Percentages retain their existing precision, and the expanded exact monthly breakdown remains full-precision.
+
 ## 3.10.4 — Clarity Light Theme & Readability Repair (November 11, 2026)
 
 - Defaulted the authenticated Cove Studio workspace to **Clarity Light** while retaining the Nocturne appearance through a working top-bar toggle.

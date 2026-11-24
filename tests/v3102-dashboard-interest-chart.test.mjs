@@ -6,6 +6,7 @@ const get=(f)=>readFileSync(new URL('../'+f,import.meta.url),'utf8');
 const js=get('public/studio-app.js'),css=get('app/studio/asset-sources.css');
 const source=js.slice(js.indexOf('function monthlyInterestSeries('),js.indexOf('function scheduleRows('));
 const fmt=(v)=>'₱'+Number(v||0).toLocaleString('en-PH',{minimumFractionDigits:0,maximumFractionDigits:2});
+const fmtDashboard=v=>'₱'+Math.round(Number(v||0)).toLocaleString('en-PH');
 const monthLabel=month=>new Date(month+'-02T12:00:00Z').toLocaleString('en-US',{month:'short',timeZone:'UTC'});
 const esc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;');
 const icon=x=>`<svg data-icon="${x}"></svg>`;
@@ -13,7 +14,7 @@ const short=x=>x||'—';
 const basic={summary:{monthly_interest_run_rate:5060,active_loans:8,scheduled_final_collection_date:'2026-12-30'}};
 const april={month:'2026-04',interest_collected:2800},may={month:'2026-05',interest_collected:3800};
 function evaluate(expression,{asOf='2026-07-20',assetBridge=[april,may],loans=[],mode='received'}={}){
- const ctx={UI:{data:{asset_bridge:assetBridge,loans,summary:basic.summary,contractual_interest_loans:[]},asof:asOf,interestChartMode:mode},fmt,esc,icon,short,monthLabel,Date,Math,Number,String,Array,Map};
+ const ctx={fmtDashboard,UI:{data:{asset_bridge:assetBridge,loans,summary:basic.summary,contractual_interest_loans:[]},asof:asOf,interestChartMode:mode},fmt,esc,icon,short,monthLabel,Date,Math,Number,String,Array,Map};
  return vm.runInNewContext(`${source}\n${expression}`,ctx);
 }
 test('monthly received chart shows actual seven-month interest, not loan principal or all collections',()=>{
